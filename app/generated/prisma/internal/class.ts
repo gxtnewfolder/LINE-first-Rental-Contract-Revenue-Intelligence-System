@@ -19,8 +19,8 @@ const config: runtime.GetPrismaClientConfig = {
   "previewFeatures": [],
   "clientVersion": "7.2.0",
   "engineVersion": "0c8ef2ce45c83248ab3df073180d5eda9e8be7a3",
-  "activeProvider": "sqlite",
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../app/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n}\n",
+  "activeProvider": "postgresql",
+  "inlineSchema": "// Rental Management System - Prisma Schema\n// Optimized for: historical rent analysis, contract versioning, monthly aggregation\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../app/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\n// ============================================================================\n// ENUMS\n// ============================================================================\n\nenum RoomStatus {\n  VACANT\n  OCCUPIED\n  MAINTENANCE\n}\n\nenum ContractStatus {\n  DRAFT // Initial creation\n  PENDING_SIGNATURE // Awaiting signatures\n  SIGNED // All parties signed\n  ACTIVE // Currently in effect\n  EXPIRING // Within 30 days of end\n  RENEWED // New contract created\n  TERMINATED // Ended (normal or early)\n}\n\nenum SignerRole {\n  OWNER\n  TENANT\n}\n\nenum PaymentStatus {\n  PENDING\n  PARTIAL\n  PAID\n  OVERDUE\n  CANCELLED\n}\n\n// ============================================================================\n// CORE ENTITIES\n// ============================================================================\n\n/// Physical building\nmodel Building {\n  id        String   @id @default(cuid())\n  name      String // e.g., \"ตึก A\", \"ตึก B\"\n  address   String?\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  rooms Room[]\n\n  @@map(\"buildings\")\n}\n\n/// Room within a building\nmodel Room {\n  id          String     @id @default(cuid())\n  buildingId  String\n  roomNumber  String // e.g., \"101\", \"A-2\"\n  floor       Int        @default(1)\n  sizeSqm     Float? // Size in square meters\n  baseRentTHB Int // Base monthly rent in THB\n  status      RoomStatus @default(VACANT)\n  description String?\n  createdAt   DateTime   @default(now())\n  updatedAt   DateTime   @updatedAt\n\n  building  Building   @relation(fields: [buildingId], references: [id], onDelete: Cascade)\n  contracts Contract[]\n\n  @@unique([buildingId, roomNumber])\n  @@index([buildingId])\n  @@index([status])\n  @@map(\"rooms\")\n}\n\n/// Tenant information\nmodel Tenant {\n  id         String   @id @default(cuid())\n  name       String\n  phone      String\n  email      String?\n  idCard     String? // Thai ID card number (encrypted in production)\n  lineUserId String?  @unique // For LINE notifications\n  address    String? // Home address\n  createdAt  DateTime @default(now())\n  updatedAt  DateTime @updatedAt\n\n  contracts Contract[]\n\n  @@index([lineUserId])\n  @@map(\"tenants\")\n}\n\n// ============================================================================\n// CONTRACT MANAGEMENT\n// ============================================================================\n\n/// Rental contract with versioning support\nmodel Contract {\n  id       String @id @default(cuid())\n  roomId   String\n  tenantId String\n\n  // Contract terms\n  startDate     DateTime\n  endDate       DateTime\n  rentAmountTHB Int // Actual rent (may differ from room base)\n  depositTHB    Int // Security deposit\n\n  // Versioning\n  version    Int     @default(1)\n  previousId String? // Link to previous version for renewals\n\n  // Status\n  status ContractStatus @default(DRAFT)\n\n  // Document\n  templateId String? // Which template was used\n  pdfUrl     String? // Generated PDF location\n  notes      String?\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  room        Room                      @relation(fields: [roomId], references: [id])\n  tenant      Tenant                    @relation(fields: [tenantId], references: [id])\n  previous    Contract?                 @relation(\"ContractHistory\", fields: [previousId], references: [id])\n  renewals    Contract[]                @relation(\"ContractHistory\")\n  signatures  ContractSignature[]\n  transitions ContractStateTransition[]\n  payments    Payment[]\n\n  @@index([roomId])\n  @@index([tenantId])\n  @@index([status])\n  @@index([startDate, endDate])\n  @@map(\"contracts\")\n}\n\n/// Digital signature record\nmodel ContractSignature {\n  id            String     @id @default(cuid())\n  contractId    String\n  signerRole    SignerRole\n  signerName    String\n  signatureData String // Base64 encoded signature image\n  signedAt      DateTime   @default(now())\n  signatureHash String // For integrity verification\n  ipAddress     String?\n  userAgent     String?\n\n  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)\n\n  @@index([contractId])\n  @@map(\"contract_signatures\")\n}\n\n/// Audit log for contract state changes\nmodel ContractStateTransition {\n  id          String         @id @default(cuid())\n  contractId  String\n  fromState   ContractStatus\n  toState     ContractStatus\n  reason      String?\n  triggeredBy String? // \"system\" | \"owner\" | userId\n  createdAt   DateTime       @default(now())\n\n  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)\n\n  @@index([contractId])\n  @@index([createdAt])\n  @@map(\"contract_state_transitions\")\n}\n\n// ============================================================================\n// PAYMENTS\n// ============================================================================\n\n/// Monthly payment record\nmodel Payment {\n  id         String @id @default(cuid())\n  contractId String\n\n  // Payment period\n  periodYear  Int // e.g., 2026\n  periodMonth Int // 1-12\n\n  // Amounts\n  amountTHB Int\n  paidTHB   Int @default(0)\n\n  // Dates\n  dueDate  DateTime\n  paidDate DateTime?\n\n  status PaymentStatus @default(PENDING)\n  notes  String?\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  contract Contract @relation(fields: [contractId], references: [id])\n\n  // Optimized for monthly aggregation queries\n  @@unique([contractId, periodYear, periodMonth])\n  @@index([contractId])\n  @@index([periodYear, periodMonth])\n  @@index([status])\n  @@index([dueDate])\n  @@map(\"payments\")\n}\n\n// ============================================================================\n// ANALYTICS\n// ============================================================================\n\n/// Thai inflation index for rent analysis\nmodel InflationIndex {\n  id        String   @id @default(cuid())\n  year      Int\n  month     Int // 1-12\n  ratePct   Float // e.g., 2.5 for 2.5%\n  cpi       Float? // Consumer Price Index value\n  source    String   @default(\"manual\") // \"manual\" | \"bot\" | API source\n  createdAt DateTime @default(now())\n\n  @@unique([year, month])\n  @@index([year, month])\n  @@map(\"inflation_index\")\n}\n\n/// Rent history for analysis (denormalized for fast queries)\nmodel RentHistory {\n  id         String   @id @default(cuid())\n  roomId     String\n  contractId String\n  year       Int\n  month      Int\n  rentTHB    Int\n  createdAt  DateTime @default(now())\n\n  @@unique([roomId, year, month])\n  @@index([roomId])\n  @@index([year, month])\n  @@map(\"rent_history\")\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -28,7 +28,7 @@ const config: runtime.GetPrismaClientConfig = {
   }
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Building\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"address\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"rooms\",\"kind\":\"object\",\"type\":\"Room\",\"relationName\":\"BuildingToRoom\"}],\"dbName\":\"buildings\"},\"Room\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"buildingId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roomNumber\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"floor\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"sizeSqm\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"baseRentTHB\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"RoomStatus\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"building\",\"kind\":\"object\",\"type\":\"Building\",\"relationName\":\"BuildingToRoom\"},{\"name\":\"contracts\",\"kind\":\"object\",\"type\":\"Contract\",\"relationName\":\"ContractToRoom\"}],\"dbName\":\"rooms\"},\"Tenant\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phone\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"idCard\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"lineUserId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"address\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"contracts\",\"kind\":\"object\",\"type\":\"Contract\",\"relationName\":\"ContractToTenant\"}],\"dbName\":\"tenants\"},\"Contract\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roomId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"tenantId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"startDate\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"endDate\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"rentAmountTHB\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"depositTHB\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"version\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"previousId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"ContractStatus\"},{\"name\":\"templateId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"pdfUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"notes\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"room\",\"kind\":\"object\",\"type\":\"Room\",\"relationName\":\"ContractToRoom\"},{\"name\":\"tenant\",\"kind\":\"object\",\"type\":\"Tenant\",\"relationName\":\"ContractToTenant\"},{\"name\":\"previous\",\"kind\":\"object\",\"type\":\"Contract\",\"relationName\":\"ContractHistory\"},{\"name\":\"renewals\",\"kind\":\"object\",\"type\":\"Contract\",\"relationName\":\"ContractHistory\"},{\"name\":\"signatures\",\"kind\":\"object\",\"type\":\"ContractSignature\",\"relationName\":\"ContractToContractSignature\"},{\"name\":\"transitions\",\"kind\":\"object\",\"type\":\"ContractStateTransition\",\"relationName\":\"ContractToContractStateTransition\"},{\"name\":\"payments\",\"kind\":\"object\",\"type\":\"Payment\",\"relationName\":\"ContractToPayment\"}],\"dbName\":\"contracts\"},\"ContractSignature\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"contractId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"signerRole\",\"kind\":\"enum\",\"type\":\"SignerRole\"},{\"name\":\"signerName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"signatureData\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"signedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"signatureHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"ipAddress\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userAgent\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"contract\",\"kind\":\"object\",\"type\":\"Contract\",\"relationName\":\"ContractToContractSignature\"}],\"dbName\":\"contract_signatures\"},\"ContractStateTransition\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"contractId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fromState\",\"kind\":\"enum\",\"type\":\"ContractStatus\"},{\"name\":\"toState\",\"kind\":\"enum\",\"type\":\"ContractStatus\"},{\"name\":\"reason\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"triggeredBy\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"contract\",\"kind\":\"object\",\"type\":\"Contract\",\"relationName\":\"ContractToContractStateTransition\"}],\"dbName\":\"contract_state_transitions\"},\"Payment\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"contractId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"periodYear\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"periodMonth\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"amountTHB\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"paidTHB\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"dueDate\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"paidDate\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"PaymentStatus\"},{\"name\":\"notes\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"contract\",\"kind\":\"object\",\"type\":\"Contract\",\"relationName\":\"ContractToPayment\"}],\"dbName\":\"payments\"},\"InflationIndex\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"year\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"month\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"ratePct\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"cpi\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"source\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"inflation_index\"},\"RentHistory\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roomId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"contractId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"year\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"month\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"rentTHB\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"rent_history\"}},\"enums\":{},\"types\":{}}")
 
 async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Module> {
   const { Buffer } = await import('node:buffer')
@@ -37,10 +37,10 @@ async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Modul
 }
 
 config.compilerWasm = {
-  getRuntime: async () => await import("@prisma/client/runtime/query_compiler_bg.sqlite.mjs"),
+  getRuntime: async () => await import("@prisma/client/runtime/query_compiler_bg.postgresql.mjs"),
 
   getQueryCompilerWasmModule: async () => {
-    const { wasm } = await import("@prisma/client/runtime/query_compiler_bg.sqlite.wasm-base64.mjs")
+    const { wasm } = await import("@prisma/client/runtime/query_compiler_bg.postgresql.wasm-base64.mjs")
     return await decodeBase64AsWasm(wasm)
   }
 }
@@ -58,8 +58,8 @@ export interface PrismaClientConstructor {
    * @example
    * ```
    * const prisma = new PrismaClient()
-   * // Fetch zero or more Users
-   * const users = await prisma.user.findMany()
+   * // Fetch zero or more Buildings
+   * const buildings = await prisma.building.findMany()
    * ```
    * 
    * Read more in our [docs](https://pris.ly/d/client).
@@ -80,8 +80,8 @@ export interface PrismaClientConstructor {
  * @example
  * ```
  * const prisma = new PrismaClient()
- * // Fetch zero or more Users
- * const users = await prisma.user.findMany()
+ * // Fetch zero or more Buildings
+ * const buildings = await prisma.building.findMany()
  * ```
  * 
  * Read more in our [docs](https://pris.ly/d/client).
@@ -174,7 +174,95 @@ export interface PrismaClient<
     extArgs: ExtArgs
   }>>
 
-    
+      /**
+   * `prisma.building`: Exposes CRUD operations for the **Building** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Buildings
+    * const buildings = await prisma.building.findMany()
+    * ```
+    */
+  get building(): Prisma.BuildingDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.room`: Exposes CRUD operations for the **Room** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Rooms
+    * const rooms = await prisma.room.findMany()
+    * ```
+    */
+  get room(): Prisma.RoomDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.tenant`: Exposes CRUD operations for the **Tenant** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Tenants
+    * const tenants = await prisma.tenant.findMany()
+    * ```
+    */
+  get tenant(): Prisma.TenantDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.contract`: Exposes CRUD operations for the **Contract** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Contracts
+    * const contracts = await prisma.contract.findMany()
+    * ```
+    */
+  get contract(): Prisma.ContractDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.contractSignature`: Exposes CRUD operations for the **ContractSignature** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ContractSignatures
+    * const contractSignatures = await prisma.contractSignature.findMany()
+    * ```
+    */
+  get contractSignature(): Prisma.ContractSignatureDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.contractStateTransition`: Exposes CRUD operations for the **ContractStateTransition** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ContractStateTransitions
+    * const contractStateTransitions = await prisma.contractStateTransition.findMany()
+    * ```
+    */
+  get contractStateTransition(): Prisma.ContractStateTransitionDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.payment`: Exposes CRUD operations for the **Payment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Payments
+    * const payments = await prisma.payment.findMany()
+    * ```
+    */
+  get payment(): Prisma.PaymentDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.inflationIndex`: Exposes CRUD operations for the **InflationIndex** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more InflationIndices
+    * const inflationIndices = await prisma.inflationIndex.findMany()
+    * ```
+    */
+  get inflationIndex(): Prisma.InflationIndexDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.rentHistory`: Exposes CRUD operations for the **RentHistory** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more RentHistories
+    * const rentHistories = await prisma.rentHistory.findMany()
+    * ```
+    */
+  get rentHistory(): Prisma.RentHistoryDelegate<ExtArgs, { omit: OmitOpts }>;
 }
 
 export function getPrismaClientClass(): PrismaClientConstructor {

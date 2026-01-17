@@ -51,7 +51,15 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-
+  Building: 'Building',
+  Room: 'Room',
+  Tenant: 'Tenant',
+  Contract: 'Contract',
+  ContractSignature: 'ContractSignature',
+  ContractStateTransition: 'ContractStateTransition',
+  Payment: 'Payment',
+  InflationIndex: 'InflationIndex',
+  RentHistory: 'RentHistory'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -61,8 +69,170 @@ export type ModelName = (typeof ModelName)[keyof typeof ModelName]
  */
 
 export const TransactionIsolationLevel = {
+  ReadUncommitted: 'ReadUncommitted',
+  ReadCommitted: 'ReadCommitted',
+  RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
 } as const
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
+
+
+export const BuildingScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  address: 'address',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BuildingScalarFieldEnum = (typeof BuildingScalarFieldEnum)[keyof typeof BuildingScalarFieldEnum]
+
+
+export const RoomScalarFieldEnum = {
+  id: 'id',
+  buildingId: 'buildingId',
+  roomNumber: 'roomNumber',
+  floor: 'floor',
+  sizeSqm: 'sizeSqm',
+  baseRentTHB: 'baseRentTHB',
+  status: 'status',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RoomScalarFieldEnum = (typeof RoomScalarFieldEnum)[keyof typeof RoomScalarFieldEnum]
+
+
+export const TenantScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  phone: 'phone',
+  email: 'email',
+  idCard: 'idCard',
+  lineUserId: 'lineUserId',
+  address: 'address',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TenantScalarFieldEnum = (typeof TenantScalarFieldEnum)[keyof typeof TenantScalarFieldEnum]
+
+
+export const ContractScalarFieldEnum = {
+  id: 'id',
+  roomId: 'roomId',
+  tenantId: 'tenantId',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  rentAmountTHB: 'rentAmountTHB',
+  depositTHB: 'depositTHB',
+  version: 'version',
+  previousId: 'previousId',
+  status: 'status',
+  templateId: 'templateId',
+  pdfUrl: 'pdfUrl',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ContractScalarFieldEnum = (typeof ContractScalarFieldEnum)[keyof typeof ContractScalarFieldEnum]
+
+
+export const ContractSignatureScalarFieldEnum = {
+  id: 'id',
+  contractId: 'contractId',
+  signerRole: 'signerRole',
+  signerName: 'signerName',
+  signatureData: 'signatureData',
+  signedAt: 'signedAt',
+  signatureHash: 'signatureHash',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent'
+} as const
+
+export type ContractSignatureScalarFieldEnum = (typeof ContractSignatureScalarFieldEnum)[keyof typeof ContractSignatureScalarFieldEnum]
+
+
+export const ContractStateTransitionScalarFieldEnum = {
+  id: 'id',
+  contractId: 'contractId',
+  fromState: 'fromState',
+  toState: 'toState',
+  reason: 'reason',
+  triggeredBy: 'triggeredBy',
+  createdAt: 'createdAt'
+} as const
+
+export type ContractStateTransitionScalarFieldEnum = (typeof ContractStateTransitionScalarFieldEnum)[keyof typeof ContractStateTransitionScalarFieldEnum]
+
+
+export const PaymentScalarFieldEnum = {
+  id: 'id',
+  contractId: 'contractId',
+  periodYear: 'periodYear',
+  periodMonth: 'periodMonth',
+  amountTHB: 'amountTHB',
+  paidTHB: 'paidTHB',
+  dueDate: 'dueDate',
+  paidDate: 'paidDate',
+  status: 'status',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
+
+
+export const InflationIndexScalarFieldEnum = {
+  id: 'id',
+  year: 'year',
+  month: 'month',
+  ratePct: 'ratePct',
+  cpi: 'cpi',
+  source: 'source',
+  createdAt: 'createdAt'
+} as const
+
+export type InflationIndexScalarFieldEnum = (typeof InflationIndexScalarFieldEnum)[keyof typeof InflationIndexScalarFieldEnum]
+
+
+export const RentHistoryScalarFieldEnum = {
+  id: 'id',
+  roomId: 'roomId',
+  contractId: 'contractId',
+  year: 'year',
+  month: 'month',
+  rentTHB: 'rentTHB',
+  createdAt: 'createdAt'
+} as const
+
+export type RentHistoryScalarFieldEnum = (typeof RentHistoryScalarFieldEnum)[keyof typeof RentHistoryScalarFieldEnum]
+
+
+export const SortOrder = {
+  asc: 'asc',
+  desc: 'desc'
+} as const
+
+export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+} as const
+
+export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

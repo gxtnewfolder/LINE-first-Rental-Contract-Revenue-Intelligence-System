@@ -1,0 +1,34 @@
+$ next dev
+▲ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.123:3000
+- Environments: .env.local
+
+✓ Starting...
+✓ Ready in 611ms
+ GET /login 200 in 946ms (compile: 512ms, render: 433ms)
+ GET /analytics 200 in 1927ms (compile: 841ms, render: 1086ms)
+ GET /rooms 200 in 1952ms (compile: 727ms, render: 1225ms)
+ GET / 200 in 2.1s (compile: 581ms, render: 1526ms)
+ GET / 200 in 335ms (compile: 4ms, render: 332ms)
+ GET / 200 in 107ms (compile: 6ms, render: 101ms)
+ GET /buildings 200 in 227ms (compile: 161ms, render: 66ms)
+ GET /rooms 200 in 64ms (compile: 3ms, render: 60ms)
+ GET /tenants 200 in 389ms (compile: 328ms, render: 61ms)
+ GET / 200 in 284ms (compile: 3ms, render: 281ms)
+ GET /buildings 200 in 104ms (compile: 31ms, render: 73ms)
+ GET /rooms 200 in 124ms (compile: 15ms, render: 109ms)
+ GET /analytics 200 in 91ms (compile: 6ms, render: 85ms)
+ GET /tenants 200 in 151ms (compile: 23ms, render: 129ms)
+ GET / 200 in 273ms (compile: 21ms, render: 252ms)
+ GET /analytics 200 in 434ms (compile: 33ms, render: 401ms)
+ GET /login 200 in 247ms (compile: 47ms, render: 200ms)
+ GET /rooms 200 in 386ms (compile: 21ms, render: 366ms)
+ GET / 200 in 267ms (compile: 51ms, render: 216ms)
+ GET /login 200 in 20ms (compile: 5ms, render: 15ms)
+ GET /buildings 200 in 57ms (compile: 9ms, render: 49ms)
+ GET /rooms 200 in 68ms (compile: 5ms, render: 63ms)
+ GET /tenants 200 in 49ms (compile: 4ms, render: 45ms)
+ GET /contracts 200 in 208ms (compile: 115ms, render: 93ms)
+ GET /tenants 200 in 106ms (compile: 10ms, render: 96ms)
+ GET / 200 in 110ms (compile: 3ms, render: 107ms)

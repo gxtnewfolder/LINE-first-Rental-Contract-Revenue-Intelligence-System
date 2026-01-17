@@ -1,8 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Rental Management System - Prisma Schema
+// Optimized for: historical rent analysis, contract versioning, monthly aggregation
 
 generator client {
   provider = "prisma-client"
@@ -10,5 +7,249 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum RoomStatus {
+  VACANT
+  OCCUPIED
+  MAINTENANCE
+}
+
+enum ContractStatus {
+  DRAFT              // Initial creation
+  PENDING_SIGNATURE  // Awaiting signatures
+  SIGNED             // All parties signed
+  ACTIVE             // Currently in effect
+  EXPIRING           // Within 30 days of end
+  RENEWED            // New contract created
+  TERMINATED         // Ended (normal or early)
+}
+
+enum SignerRole {
+  OWNER
+  TENANT
+}
+
+enum PaymentStatus {
+  PENDING
+  PARTIAL
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+// ============================================================================
+// CORE ENTITIES
+// ============================================================================
+
+/// Physical building
+model Building {
+  id        String   @id @default(cuid())
+  name      String   // e.g., "ตึก A", "ตึก B"
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  rooms Room[]
+
+  @@map("buildings")
+}
+
+/// Room within a building
+model Room {
+  id          String     @id @default(cuid())
+  buildingId  String
+  roomNumber  String     // e.g., "101", "A-2"
+  floor       Int        @default(1)
+  sizeSqm     Float?     // Size in square meters
+  baseRentTHB Int        // Base monthly rent in THB
+  status      RoomStatus @default(VACANT)
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  building  Building   @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  contracts Contract[]
+
+  @@unique([buildingId, roomNumber])
+  @@index([buildingId])
+  @@index([status])
+  @@map("rooms")
+}
+
+/// Tenant information
+model Tenant {
+  id         String   @id @default(cuid())
+  name       String
+  phone      String
+  email      String?
+  idCard     String?  // Thai ID card number (encrypted in production)
+  lineUserId String?  @unique // For LINE notifications
+  address    String?  // Home address
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  contracts Contract[]
+
+  @@index([lineUserId])
+  @@map("tenants")
+}
+
+// ============================================================================
+// CONTRACT MANAGEMENT
+// ============================================================================
+
+/// Rental contract with versioning support
+model Contract {
+  id             String         @id @default(cuid())
+  roomId         String
+  tenantId       String
+  
+  // Contract terms
+  startDate      DateTime
+  endDate        DateTime
+  rentAmountTHB  Int            // Actual rent (may differ from room base)
+  depositTHB     Int            // Security deposit
+  
+  // Versioning
+  version        Int            @default(1)
+  previousId     String?        // Link to previous version for renewals
+  
+  // Status
+  status         ContractStatus @default(DRAFT)
+  
+  // Document
+  templateId     String?        // Which template was used
+  pdfUrl         String?        // Generated PDF location
+  notes          String?
+  
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  room           Room                      @relation(fields: [roomId], references: [id])
+  tenant         Tenant                    @relation(fields: [tenantId], references: [id])
+  previous       Contract?                 @relation("ContractHistory", fields: [previousId], references: [id])
+  renewals       Contract[]                @relation("ContractHistory")
+  signatures     ContractSignature[]
+  transitions    ContractStateTransition[]
+  payments       Payment[]
+
+  @@index([roomId])
+  @@index([tenantId])
+  @@index([status])
+  @@index([startDate, endDate])
+  @@map("contracts")
+}
+
+/// Digital signature record
+model ContractSignature {
+  id            String    @id @default(cuid())
+  contractId    String
+  signerRole    SignerRole
+  signerName    String
+  signatureData String    // Base64 encoded signature image
+  signedAt      DateTime  @default(now())
+  signatureHash String    // For integrity verification
+  ipAddress     String?
+  userAgent     String?
+
+  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@index([contractId])
+  @@map("contract_signatures")
+}
+
+/// Audit log for contract state changes
+model ContractStateTransition {
+  id         String         @id @default(cuid())
+  contractId String
+  fromState  ContractStatus
+  toState    ContractStatus
+  reason     String?
+  triggeredBy String?       // "system" | "owner" | userId
+  createdAt  DateTime       @default(now())
+
+  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@index([contractId])
+  @@index([createdAt])
+  @@map("contract_state_transitions")
+}
+
+// ============================================================================
+// PAYMENTS
+// ============================================================================
+
+/// Monthly payment record
+model Payment {
+  id          String        @id @default(cuid())
+  contractId  String
+  
+  // Payment period
+  periodYear  Int           // e.g., 2026
+  periodMonth Int           // 1-12
+  
+  // Amounts
+  amountTHB   Int
+  paidTHB     Int           @default(0)
+  
+  // Dates
+  dueDate     DateTime
+  paidDate    DateTime?
+  
+  status      PaymentStatus @default(PENDING)
+  notes       String?
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  contract Contract @relation(fields: [contractId], references: [id])
+
+  // Optimized for monthly aggregation queries
+  @@unique([contractId, periodYear, periodMonth])
+  @@index([contractId])
+  @@index([periodYear, periodMonth])
+  @@index([status])
+  @@index([dueDate])
+  @@map("payments")
+}
+
+// ============================================================================
+// ANALYTICS
+// ============================================================================
+
+/// Thai inflation index for rent analysis
+model InflationIndex {
+  id        String   @id @default(cuid())
+  year      Int
+  month     Int      // 1-12
+  ratePct   Float    // e.g., 2.5 for 2.5%
+  cpi       Float?   // Consumer Price Index value
+  source    String   @default("manual") // "manual" | "bot" | API source
+  createdAt DateTime @default(now())
+
+  @@unique([year, month])
+  @@index([year, month])
+  @@map("inflation_index")
+}
+
+/// Rent history for analysis (denormalized for fast queries)
+model RentHistory {
+  id          String   @id @default(cuid())
+  roomId      String
+  contractId  String
+  year        Int
+  month       Int
+  rentTHB     Int
+  createdAt   DateTime @default(now())
+
+  @@unique([roomId, year, month])
+  @@index([roomId])
+  @@index([year, month])
+  @@map("rent_history")
 }

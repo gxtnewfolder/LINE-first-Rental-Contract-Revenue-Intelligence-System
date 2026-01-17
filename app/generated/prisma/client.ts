@@ -29,8 +29,8 @@ export * from "./enums"
  * @example
  * ```
  * const prisma = new PrismaClient()
- * // Fetch zero or more Users
- * const users = await prisma.user.findMany()
+ * // Fetch zero or more Buildings
+ * const buildings = await prisma.building.findMany()
  * ```
  * 
  * Read more in our [docs](https://pris.ly/d/client).
@@ -39,4 +39,48 @@ export const PrismaClient = $Class.getPrismaClientClass()
 export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts extends Prisma.PrismaClientOptions["omit"] = Prisma.PrismaClientOptions["omit"], ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = $Class.PrismaClient<LogOpts, OmitOpts, ExtArgs>
 export { Prisma }
 
-
+/**
+ * Model Building
+ * Physical building
+ */
+export type Building = Prisma.BuildingModel
+/**
+ * Model Room
+ * Room within a building
+ */
+export type Room = Prisma.RoomModel
+/**
+ * Model Tenant
+ * Tenant information
+ */
+export type Tenant = Prisma.TenantModel
+/**
+ * Model Contract
+ * Rental contract with versioning support
+ */
+export type Contract = Prisma.ContractModel
+/**
+ * Model ContractSignature
+ * Digital signature record
+ */
+export type ContractSignature = Prisma.ContractSignatureModel
+/**
+ * Model ContractStateTransition
+ * Audit log for contract state changes
+ */
+export type ContractStateTransition = Prisma.ContractStateTransitionModel
+/**
+ * Model Payment
+ * Monthly payment record
+ */
+export type Payment = Prisma.PaymentModel
+/**
+ * Model InflationIndex
+ * Thai inflation index for rent analysis
+ */
+export type InflationIndex = Prisma.InflationIndexModel
+/**
+ * Model RentHistory
+ * Rent history for analysis (denormalized for fast queries)
+ */
+export type RentHistory = Prisma.RentHistoryModel

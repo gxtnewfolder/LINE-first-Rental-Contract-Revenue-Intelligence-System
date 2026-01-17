@@ -8,4 +8,13 @@
  *
  * 🟢 You can import this file directly.
  */
+export type * from './models/Building'
+export type * from './models/Room'
+export type * from './models/Tenant'
+export type * from './models/Contract'
+export type * from './models/ContractSignature'
+export type * from './models/ContractStateTransition'
+export type * from './models/Payment'
+export type * from './models/InflationIndex'
+export type * from './models/RentHistory'
 export type * from './commonInputTypes'

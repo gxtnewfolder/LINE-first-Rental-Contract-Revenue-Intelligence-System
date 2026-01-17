@@ -17,4 +17,48 @@ import * as Prisma from './internal/prismaNamespaceBrowser'
 export { Prisma }
 export * as $Enums from './enums'
 export * from './enums';
-
+/**
+ * Model Building
+ * Physical building
+ */
+export type Building = Prisma.BuildingModel
+/**
+ * Model Room
+ * Room within a building
+ */
+export type Room = Prisma.RoomModel
+/**
+ * Model Tenant
+ * Tenant information
+ */
+export type Tenant = Prisma.TenantModel
+/**
+ * Model Contract
+ * Rental contract with versioning support
+ */
+export type Contract = Prisma.ContractModel
+/**
+ * Model ContractSignature
+ * Digital signature record
+ */
+export type ContractSignature = Prisma.ContractSignatureModel
+/**
+ * Model ContractStateTransition
+ * Audit log for contract state changes
+ */
+export type ContractStateTransition = Prisma.ContractStateTransitionModel
+/**
+ * Model Payment
+ * Monthly payment record
+ */
+export type Payment = Prisma.PaymentModel
+/**
+ * Model InflationIndex
+ * Thai inflation index for rent analysis
+ */
+export type InflationIndex = Prisma.InflationIndexModel
+/**
+ * Model RentHistory
+ * Rent history for analysis (denormalized for fast queries)
+ */
+export type RentHistory = Prisma.RentHistoryModel
