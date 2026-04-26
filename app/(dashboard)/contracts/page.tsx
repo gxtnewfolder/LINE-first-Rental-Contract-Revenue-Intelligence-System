@@ -1,7 +1,8 @@
 import { contractService, type ContractWithRelations } from '@/services';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Calendar, Download, Send, Plus, ArrowRight } from 'lucide-react';
+
+import { FileText, Calendar, Plus, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import type { ContractStatus } from '@/app/generated/prisma/client';
@@ -46,7 +47,11 @@ export default async function ContractsPage() {
           const badgeLabel = STATUS_LABEL[contract.status] ?? contract.status;
 
           return (
-            <div key={contract.id} className="surface rounded-xl p-5 flex flex-col sm:flex-row sm:items-center gap-4 group hover:border-primary/40 transition-colors">
+            <Link
+              key={contract.id}
+              href={`/contracts/${contract.id}`}
+              className="surface rounded-xl p-5 flex flex-col sm:flex-row sm:items-center gap-4 group hover:border-primary/40 transition-colors cursor-pointer"
+            >
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                 <FileText className="w-4 h-4 text-primary" />
               </div>
@@ -65,7 +70,7 @@ export default async function ContractsPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 shrink-0">
                 <div className="text-right">
                   <p className="text-[10px] text-muted-foreground uppercase tracking-wider">ค่าเช่า/เดือน</p>
                   <p className="font-black tabnum">฿{contract.rentAmountTHB.toLocaleString()}</p>
@@ -75,19 +80,9 @@ export default async function ContractsPage() {
                   {badgeLabel}
                 </Badge>
 
-                <div className="flex items-center gap-1.5 ml-1">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-accent text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Download className="w-3.5 h-3.5" />
-                  </Button>
-                  {contract.status === 'PENDING_SIGNATURE' && (
-                    <Button size="sm" className="h-8 bg-primary text-white hover:bg-primary/90 font-bold gap-1.5 text-xs shadow-sm">
-                      <Send className="w-3 h-3" />
-                      ส่งลิงก์
-                    </Button>
-                  )}
-                </div>
+                <ArrowRight className="w-4 h-4 text-muted-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>
