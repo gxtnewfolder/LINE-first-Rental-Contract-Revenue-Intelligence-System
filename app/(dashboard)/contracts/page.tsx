@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { FileText, Calendar, Download, Send, Plus, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 import type { ContractStatus } from '@/app/generated/prisma/client';
 
 const STATUS_STYLE: Partial<Record<ContractStatus, string>> = {
@@ -31,9 +32,11 @@ export default async function ContractsPage() {
           <h1 className="text-2xl font-black tracking-tight">สัญญา</h1>
           <p className="text-sm text-muted-foreground mt-0.5">สัญญาเช่าและลายเซ็นดิจิทัล</p>
         </div>
-        <Button size="sm" className="bg-primary text-white hover:bg-primary/90 font-bold gap-1.5 shadow-sm">
-          <Plus className="w-4 h-4" />
-          สร้างสัญญา
+        <Button size="sm" className="bg-primary text-white hover:bg-primary/90 font-bold gap-1.5 shadow-sm" asChild>
+          <Link href="/contracts/new">
+            <Plus className="w-4 h-4" />
+            สร้างสัญญา
+          </Link>
         </Button>
       </div>
 

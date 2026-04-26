@@ -16,6 +16,14 @@ import { cn } from '@/lib/utils';
 
 const NAV_ITEMS = [
   { href: '/', label: 'ภาพรวม', icon: LayoutDashboard },
+  { href: '/rooms', label: 'ห้อง', icon: Key },
+  { href: '/contracts', label: 'สัญญา', icon: FileText },
+  { href: '/tenants', label: 'ผู้เช่า', icon: Users },
+  { href: '/analytics', label: 'รายงาน', icon: BarChart3 },
+];
+
+const SIDEBAR_ITEMS = [
+  { href: '/', label: 'ภาพรวม', icon: LayoutDashboard },
   { href: '/buildings', label: 'อาคาร', icon: Building2 },
   { href: '/rooms', label: 'ห้องพัก', icon: Key },
   { href: '/tenants', label: 'ผู้เช่า', icon: Users },
@@ -25,13 +33,13 @@ const NAV_ITEMS = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const currentPage = NAV_ITEMS.find(i => i.href === pathname)?.label ?? '';
+  const currentPage = SIDEBAR_ITEMS.find(i => i.href === pathname)?.label ?? '';
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
 
-      {/* Sidebar */}
-      <aside className="w-64 shrink-0 flex flex-col border-r border-border bg-white shadow-sm">
+      {/* Sidebar — desktop only */}
+      <aside className="hidden lg:flex w-64 shrink-0 flex-col border-r border-border bg-white shadow-sm">
         {/* Logo */}
         <div className="h-16 flex items-center gap-3 px-6 border-b border-border">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
@@ -45,7 +53,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Nav */}
         <nav className="flex-1 px-4 py-5 space-y-1 overflow-y-auto">
-          {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+          {SIDEBAR_ITEMS.map(({ href, label, icon: Icon }) => {
             const active = pathname === href;
             return (
               <Link
@@ -80,23 +88,60 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Main */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
 
         {/* Topbar */}
-        <header className="h-16 shrink-0 flex items-center justify-between px-8 border-b border-border bg-white shadow-sm">
+        <header className="h-14 lg:h-16 shrink-0 flex items-center justify-between px-4 lg:px-8 border-b border-border bg-white shadow-sm">
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">VARA</span>
-            <span className="text-border mx-1">/</span>
-            <span className="font-bold text-foreground">{currentPage}</span>
+            {/* Mobile: show VARA logo */}
+            <div className="lg:hidden w-7 h-7 rounded-lg bg-primary flex items-center justify-center mr-1">
+              <span className="text-xs font-black text-white">V</span>
+            </div>
+            <span className="text-muted-foreground hidden lg:inline">VARA</span>
+            <span className="text-border mx-1 hidden lg:inline">/</span>
+            <span className="font-bold text-foreground">{currentPage || 'VARA'}</span>
           </div>
+
+          {/* Mobile: sign out button */}
+          <form action="/api/auth/logout" method="POST" className="lg:hidden">
+            <button type="submit" className="p-2 rounded-lg text-muted-foreground hover:bg-accent transition-colors">
+              <LogOut className="w-4 h-4" />
+            </button>
+          </form>
         </header>
 
+        {/* Scrollable content — add bottom padding on mobile for the nav bar */}
         <main className="flex-1 overflow-y-auto">
-          <div className="p-8">
+          <div className="p-4 lg:p-8 pb-24 lg:pb-8">
             {children}
           </div>
         </main>
       </div>
+
+      {/* Bottom nav — mobile only */}
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-border z-50">
+        <div className="flex items-stretch">
+          {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+            const active = pathname === href || (href !== '/' && pathname.startsWith(href));
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  'flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 text-[10px] font-semibold transition-colors',
+                  active
+                    ? 'text-primary'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <Icon className={cn('w-5 h-5', active && 'text-primary')} />
+                {label}
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+
     </div>
   );
 }
