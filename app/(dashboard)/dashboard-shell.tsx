@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Building2, Key, Users,
-  FileText, BarChart3, LogOut, MessageSquare, Zap,
+  FileText, BarChart3, LogOut, MessageSquare, Zap, Shield,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -31,9 +31,10 @@ interface Props {
   children: React.ReactNode;
   plan: 'LITE' | 'PRO';
   displayName?: string;
+  isAdmin?: boolean;
 }
 
-export function DashboardShell({ children, plan }: Props) {
+export function DashboardShell({ children, plan, isAdmin }: Props) {
   const pathname = usePathname();
 
   function isActive(href: string) {
@@ -80,6 +81,20 @@ export function DashboardShell({ children, plan }: Props) {
               </Link>
             );
           })}
+          {isAdmin && (
+            <Link
+              href="/settings/admin"
+              className={cn(
+                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150',
+                isActive('/settings/admin')
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+              )}
+            >
+              <Shield className="w-[18px] h-[18px] shrink-0" />
+              Admin
+            </Link>
+          )}
         </nav>
 
         {/* Plan badge + Sign out */}
