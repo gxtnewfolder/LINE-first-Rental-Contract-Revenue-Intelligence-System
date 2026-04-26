@@ -115,8 +115,9 @@ model Tenant {
   phone      String
   email      String?
   idCard     String?  // Thai ID card number (encrypted in production)
-  lineUserId String?  @unique // For LINE notifications
-  address    String?  // Home address
+  lineUserId  String?  @unique // For LINE notifications
+  inviteToken String?  @unique // One-time token for LIFF self-registration
+  address     String?  // Home address
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 

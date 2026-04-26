@@ -32,6 +32,11 @@ export const config = {
     isDev: process.env.NODE_ENV !== 'production',
   },
 
+  // LINE LIFF (for tenant self-registration)
+  liff: {
+    id: process.env.NEXT_PUBLIC_LIFF_ID || '',
+  },
+
   // LINE Login channel (OAuth2 for web dashboard)
   lineLogin: {
     channelId: process.env.LINE_LOGIN_CHANNEL_ID || '',
