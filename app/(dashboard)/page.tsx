@@ -28,7 +28,7 @@ export default async function DashboardPage() {
 
   const stats = [
     {
-      label: 'Monthly Revenue',
+      label: 'รายได้เดือนนี้',
       value: `฿${snapshot.income.total.toLocaleString()}`,
       change: '+12.5%',
       up: true,
@@ -36,28 +36,28 @@ export default async function DashboardPage() {
       accent: 'text-primary',
     },
     {
-      label: 'Occupancy',
+      label: 'อัตราการเข้าพัก',
       value: `${snapshot.occupancy.current}%`,
-      change: 'Stable',
+      change: 'คงที่',
       up: null,
       icon: Home,
-      accent: 'text-emerald-400',
+      accent: 'text-emerald-600',
     },
     {
-      label: 'Collection Rate',
+      label: 'อัตราการเก็บเงิน',
       value: `${snapshot.collection.rate}%`,
       change: '-2.1%',
       up: false,
       icon: TrendingUp,
-      accent: 'text-sky-400',
+      accent: 'text-sky-600',
     },
     {
-      label: 'Expiring Soon',
+      label: 'สัญญาใกล้หมดอายุ',
       value: String(snapshot.contracts.expiringSoon.length),
-      change: 'Next 30 days',
+      change: '30 วันถัดไป',
       up: null,
       icon: Calendar,
-      accent: 'text-amber-400',
+      accent: 'text-amber-600',
     },
   ];
 
@@ -66,9 +66,8 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
 
-      {/* Page header */}
       <div>
-        <h1 className="text-2xl font-black tracking-tight text-foreground">Overview</h1>
+        <h1 className="text-2xl font-black tracking-tight text-foreground">ภาพรวม</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
           {now.toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
         </p>
@@ -81,15 +80,15 @@ export default async function DashboardPage() {
           return (
             <div key={s.label} className="surface rounded-xl p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <Icon className={cn('w-4 h-4', s.accent)} />
+                <Icon className={cn('w-5 h-5', s.accent)} />
                 <span className={cn(
                   'flex items-center gap-0.5 text-xs font-semibold',
-                  s.up === true && 'text-emerald-400',
-                  s.up === false && 'text-rose-400',
+                  s.up === true && 'text-emerald-600',
+                  s.up === false && 'text-rose-600',
                   s.up === null && 'text-muted-foreground',
                 )}>
-                  {s.up === true && <ArrowUpRight className="w-3 h-3" />}
-                  {s.up === false && <ArrowDownRight className="w-3 h-3" />}
+                  {s.up === true && <ArrowUpRight className="w-3.5 h-3.5" />}
+                  {s.up === false && <ArrowDownRight className="w-3.5 h-3.5" />}
                   {s.change}
                 </span>
               </div>
@@ -102,16 +101,14 @@ export default async function DashboardPage() {
         })}
       </div>
 
-      {/* Middle row: Chart + AI */}
+      {/* Chart + AI */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {/* Revenue trend */}
         <div className="surface rounded-xl p-5 lg:col-span-1">
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <h2 className="text-sm font-bold">Revenue Trend</h2>
-              <p className="text-xs text-muted-foreground">Last 6 months</p>
-            </div>
+          <div className="mb-5">
+            <h2 className="text-sm font-bold">รายได้ย้อนหลัง</h2>
+            <p className="text-xs text-muted-foreground">6 เดือนที่ผ่านมา</p>
           </div>
           <div className="flex items-end gap-1.5 h-36">
             {trend.map((t, i) => {
@@ -122,7 +119,7 @@ export default async function DashboardPage() {
                   <div
                     className={cn(
                       'w-full rounded-t-sm transition-all',
-                      isLast ? 'bg-primary' : 'bg-primary/25 group-hover:bg-primary/40'
+                      isLast ? 'bg-primary' : 'bg-primary/20 group-hover:bg-primary/40'
                     )}
                     style={{ height: `${h}%` }}
                     title={`฿${t.total.toLocaleString()}`}
@@ -139,16 +136,16 @@ export default async function DashboardPage() {
         {/* AI Summary */}
         <div className="surface rounded-xl p-5 lg:col-span-2 flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center">
-              <Sparkles className="w-3.5 h-3.5 text-primary" />
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-primary" />
             </div>
-            <span className="text-sm font-bold">AI Summary</span>
+            <span className="text-sm font-bold">สรุปจาก AI</span>
             <Badge className="ml-auto text-[10px] bg-primary/10 text-primary border-primary/20 hover:bg-primary/10 font-semibold">
               {now.toLocaleDateString('th-TH', { month: 'short', year: 'numeric' })}
             </Badge>
           </div>
 
-          <div className="flex-1 surface-raised rounded-lg p-4 text-sm text-muted-foreground leading-relaxed space-y-2 min-h-[120px]">
+          <div className="flex-1 bg-secondary/40 rounded-xl p-4 text-sm text-muted-foreground leading-relaxed space-y-2 min-h-[120px]">
             {aiSummary.content.split('\n').filter(Boolean).map((line, i) => (
               <p key={i}>{line}</p>
             ))}
@@ -156,15 +153,15 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Bottom row: Overdue + Expiring */}
+      {/* Overdue + Expiring */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* Overdue */}
         <div className="surface rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-bold">Overdue Payments</h2>
-            <Badge variant="outline" className="text-rose-400 border-rose-400/20 text-[10px]">
-              {snapshot.collection.overdue.length} pending
+            <h2 className="text-sm font-bold">ค้างชำระ</h2>
+            <Badge variant="outline" className="text-rose-600 border-rose-200 bg-rose-50 text-[10px]">
+              {snapshot.collection.overdue.length} รายการ
             </Badge>
           </div>
 
@@ -172,21 +169,21 @@ export default async function DashboardPage() {
             <div className="space-y-2">
               {snapshot.collection.overdue.map((p, i) => (
                 <div key={i} className="flex items-center gap-3 surface-raised rounded-lg px-3 py-2.5">
-                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                  <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold">Room {p.room}</p>
-                    <p className="text-xs text-muted-foreground tabnum">฿{p.amount.toLocaleString()} · {p.daysPastDue}d overdue</p>
+                    <p className="text-sm font-semibold">ห้อง {p.room}</p>
+                    <p className="text-xs text-muted-foreground tabnum">฿{p.amount.toLocaleString()} · เกิน {p.daysPastDue} วัน</p>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-xs text-rose-400 hover:bg-rose-400/10 hover:text-rose-400 h-7 px-2">
-                    Remind
+                  <Button variant="ghost" size="sm" className="text-xs text-rose-600 hover:bg-rose-50 hover:text-rose-600 h-7 px-2">
+                    แจ้งเตือน
                   </Button>
                 </div>
               ))}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-8 text-muted-foreground gap-2">
-              <CheckCircle2 className="w-8 h-8 text-emerald-400/50" />
-              <p className="text-sm">All payments collected</p>
+              <CheckCircle2 className="w-8 h-8 text-emerald-500" />
+              <p className="text-sm">เก็บเงินครบทุกห้องแล้ว</p>
             </div>
           )}
         </div>
@@ -194,9 +191,9 @@ export default async function DashboardPage() {
         {/* Expiring contracts */}
         <div className="surface rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-bold">Expiring Soon</h2>
-            <Badge variant="outline" className="text-amber-400 border-amber-400/20 text-[10px]">
-              {snapshot.contracts.expiringSoon.length} contracts
+            <h2 className="text-sm font-bold">สัญญาใกล้หมดอายุ</h2>
+            <Badge variant="outline" className="text-amber-700 border-amber-200 bg-amber-50 text-[10px]">
+              {snapshot.contracts.expiringSoon.length} สัญญา
             </Badge>
           </div>
 
@@ -204,21 +201,21 @@ export default async function DashboardPage() {
             <div className="space-y-2">
               {snapshot.contracts.expiringSoon.map((c, i) => (
                 <div key={i} className="flex items-center gap-3 surface-raised rounded-lg px-3 py-2.5">
-                  <Clock className="w-4 h-4 text-amber-400 shrink-0" />
+                  <Clock className="w-4 h-4 text-amber-600 shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold">Room {c.room}</p>
-                    <p className="text-xs text-muted-foreground truncate">{c.tenant} · {c.daysRemaining}d left</p>
+                    <p className="text-sm font-semibold">ห้อง {c.room}</p>
+                    <p className="text-xs text-muted-foreground truncate">{c.tenant} · เหลือ {c.daysRemaining} วัน</p>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-xs text-amber-400 hover:bg-amber-400/10 hover:text-amber-400 h-7 px-2">
-                    Renew
+                  <Button variant="ghost" size="sm" className="text-xs text-amber-700 hover:bg-amber-50 hover:text-amber-700 h-7 px-2">
+                    ต่อสัญญา
                   </Button>
                 </div>
               ))}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-8 text-muted-foreground gap-2">
-              <CheckCircle2 className="w-8 h-8 text-emerald-400/50" />
-              <p className="text-sm">No contracts expiring soon</p>
+              <CheckCircle2 className="w-8 h-8 text-emerald-500" />
+              <p className="text-sm">ไม่มีสัญญาใกล้หมดอายุ</p>
             </div>
           )}
         </div>
@@ -226,4 +223,3 @@ export default async function DashboardPage() {
     </div>
   );
 }
-

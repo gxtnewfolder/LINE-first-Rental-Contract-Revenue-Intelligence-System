@@ -9,45 +9,51 @@ export default async function RoomsPage() {
   const rooms = await roomService.findAll();
 
   const statusStyle: Record<string, string> = {
-    OCCUPIED: 'bg-primary/10 text-primary border-primary/20',
-    VACANT: 'bg-emerald-400/10 text-emerald-400 border-emerald-400/20',
-    MAINTENANCE: 'bg-amber-400/10 text-amber-400 border-amber-400/20',
+    OCCUPIED: 'bg-primary/10 text-primary border-primary/30',
+    VACANT:   'bg-emerald-50 text-emerald-700 border-emerald-200',
+    MAINTENANCE: 'bg-amber-50 text-amber-700 border-amber-200',
+  };
+
+  const statusLabel: Record<string, string> = {
+    OCCUPIED: 'มีผู้เช่า',
+    VACANT: 'ว่าง',
+    MAINTENANCE: 'ซ่อมแซม',
   };
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black tracking-tight">Rooms</h1>
+          <h1 className="text-2xl font-black tracking-tight">ห้องพัก</h1>
           <p className="text-sm text-muted-foreground mt-0.5">จัดการห้องพักทั้งหมด</p>
         </div>
-        <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold gap-1.5">
+        <Button size="sm" className="bg-primary text-white hover:bg-primary/90 font-bold gap-1.5 shadow-sm">
           <Plus className="w-4 h-4" />
-          Add Room
+          เพิ่มห้อง
         </Button>
       </div>
 
       <div className="surface rounded-xl overflow-hidden">
         <table className="w-full text-left">
           <thead>
-            <tr className="border-b border-border">
-              <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Unit</th>
-              <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Building</th>
-              <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground text-center">Floor</th>
-              <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Rent / mo</th>
-              <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Status</th>
-              <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground text-right">Action</th>
+            <tr className="border-b border-border bg-secondary/30">
+              <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-muted-foreground">ห้อง</th>
+              <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-muted-foreground">อาคาร</th>
+              <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-muted-foreground text-center">ชั้น</th>
+              <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-muted-foreground">ค่าเช่า/เดือน</th>
+              <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-muted-foreground">สถานะ</th>
+              <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-muted-foreground text-right">แก้ไข</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {rooms.map((room) => (
-              <tr key={room.id} className="hover:bg-accent/40 transition-colors group">
+              <tr key={room.id} className="hover:bg-accent/50 transition-colors group">
                 <td className="px-5 py-4">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                       <Key className="w-3.5 h-3.5 text-primary" />
                     </div>
-                    <span className="font-black tabnum">{room.roomNumber}</span>
+                    <span className="font-black tabnum text-sm">{room.roomNumber}</span>
                   </div>
                 </td>
                 <td className="px-5 py-4">
@@ -57,14 +63,14 @@ export default async function RoomsPage() {
                   </div>
                 </td>
                 <td className="px-5 py-4 text-center">
-                  <span className="text-sm tabnum text-muted-foreground">{room.floor}</span>
+                  <span className="text-sm tabnum text-muted-foreground font-medium">{room.floor}</span>
                 </td>
                 <td className="px-5 py-4">
                   <span className="font-black tabnum">฿{room.baseRentTHB.toLocaleString()}</span>
                 </td>
                 <td className="px-5 py-4">
-                  <Badge className={cn('text-[10px] font-bold', statusStyle[room.status] ?? 'bg-muted/10 text-muted border-muted/20')}>
-                    {room.status}
+                  <Badge className={cn('text-xs font-semibold', statusStyle[room.status] ?? 'bg-muted/20 text-muted-foreground border-border')}>
+                    {statusLabel[room.status] ?? room.status}
                   </Badge>
                 </td>
                 <td className="px-5 py-4 text-right">
