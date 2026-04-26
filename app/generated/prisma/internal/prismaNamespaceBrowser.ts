@@ -128,6 +128,7 @@ export const TenantScalarFieldEnum = {
   email: 'email',
   idCard: 'idCard',
   lineUserId: 'lineUserId',
+  inviteToken: 'inviteToken',
   address: 'address',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

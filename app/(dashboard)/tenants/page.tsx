@@ -4,6 +4,7 @@ import { getSession } from '@/lib/auth';
 import { Badge } from '@/components/ui/badge';
 import { Phone, Mail, MessageSquare } from 'lucide-react';
 import { AddTenantDialog } from '@/components/add-tenant-dialog';
+import { InviteLINEButton } from '@/components/invite-line-button';
 
 export default async function TenantsPage() {
   const session = await getSession();
@@ -36,12 +37,14 @@ export default async function TenantsPage() {
                   <p className="font-bold truncate">{tenant.name}</p>
                   <p className="text-xs text-muted-foreground font-mono uppercase mt-0.5">#{tenant.id.slice(-6)}</p>
                 </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  {tenant.lineUserId && (
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {tenant.lineUserId ? (
                     <Badge className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200 gap-1">
                       <MessageSquare className="w-2.5 h-2.5" />
-                      LINE
+                      LINE ✓
                     </Badge>
+                  ) : (
+                    <InviteLINEButton tenantId={tenant.id} tenantName={tenant.name} />
                   )}
                   <AddTenantDialog initialData={{
                     id: tenant.id,

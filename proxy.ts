@@ -8,7 +8,9 @@ const SESSION_COOKIE = 'rental_session';
 const PUBLIC_PREFIXES = [
   '/login',
   '/sign/',
+  '/tenant/register',
   '/api/auth/',
+  '/api/tenant/register',
   '/api/webhooks/',
   '/api/cron/',
   '/_next/',

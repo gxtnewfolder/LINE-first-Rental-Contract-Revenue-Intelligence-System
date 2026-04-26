@@ -32,6 +32,7 @@ export type TenantMinAggregateOutputType = {
   email: string | null
   idCard: string | null
   lineUserId: string | null
+  inviteToken: string | null
   address: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -45,6 +46,7 @@ export type TenantMaxAggregateOutputType = {
   email: string | null
   idCard: string | null
   lineUserId: string | null
+  inviteToken: string | null
   address: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -58,6 +60,7 @@ export type TenantCountAggregateOutputType = {
   email: number
   idCard: number
   lineUserId: number
+  inviteToken: number
   address: number
   createdAt: number
   updatedAt: number
@@ -73,6 +76,7 @@ export type TenantMinAggregateInputType = {
   email?: true
   idCard?: true
   lineUserId?: true
+  inviteToken?: true
   address?: true
   createdAt?: true
   updatedAt?: true
@@ -86,6 +90,7 @@ export type TenantMaxAggregateInputType = {
   email?: true
   idCard?: true
   lineUserId?: true
+  inviteToken?: true
   address?: true
   createdAt?: true
   updatedAt?: true
@@ -99,6 +104,7 @@ export type TenantCountAggregateInputType = {
   email?: true
   idCard?: true
   lineUserId?: true
+  inviteToken?: true
   address?: true
   createdAt?: true
   updatedAt?: true
@@ -185,6 +191,7 @@ export type TenantGroupByOutputType = {
   email: string | null
   idCard: string | null
   lineUserId: string | null
+  inviteToken: string | null
   address: string | null
   createdAt: Date
   updatedAt: Date
@@ -219,6 +226,7 @@ export type TenantWhereInput = {
   email?: Prisma.StringNullableFilter<"Tenant"> | string | null
   idCard?: Prisma.StringNullableFilter<"Tenant"> | string | null
   lineUserId?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  inviteToken?: Prisma.StringNullableFilter<"Tenant"> | string | null
   address?: Prisma.StringNullableFilter<"Tenant"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
@@ -234,6 +242,7 @@ export type TenantOrderByWithRelationInput = {
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   idCard?: Prisma.SortOrderInput | Prisma.SortOrder
   lineUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  inviteToken?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -244,6 +253,7 @@ export type TenantOrderByWithRelationInput = {
 export type TenantWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   lineUserId?: string
+  inviteToken?: string
   AND?: Prisma.TenantWhereInput | Prisma.TenantWhereInput[]
   OR?: Prisma.TenantWhereInput[]
   NOT?: Prisma.TenantWhereInput | Prisma.TenantWhereInput[]
@@ -257,7 +267,7 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   owner?: Prisma.XOR<Prisma.OwnerNullableScalarRelationFilter, Prisma.OwnerWhereInput> | null
   contracts?: Prisma.ContractListRelationFilter
-}, "id" | "lineUserId">
+}, "id" | "lineUserId" | "inviteToken">
 
 export type TenantOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -267,6 +277,7 @@ export type TenantOrderByWithAggregationInput = {
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   idCard?: Prisma.SortOrderInput | Prisma.SortOrder
   lineUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  inviteToken?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -286,6 +297,7 @@ export type TenantScalarWhereWithAggregatesInput = {
   email?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
   idCard?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
   lineUserId?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
+  inviteToken?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
   address?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Tenant"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Tenant"> | Date | string
@@ -298,6 +310,7 @@ export type TenantCreateInput = {
   email?: string | null
   idCard?: string | null
   lineUserId?: string | null
+  inviteToken?: string | null
   address?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -313,6 +326,7 @@ export type TenantUncheckedCreateInput = {
   email?: string | null
   idCard?: string | null
   lineUserId?: string | null
+  inviteToken?: string | null
   address?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -326,6 +340,7 @@ export type TenantUpdateInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idCard?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lineUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inviteToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -341,6 +356,7 @@ export type TenantUncheckedUpdateInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idCard?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lineUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inviteToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -355,6 +371,7 @@ export type TenantCreateManyInput = {
   email?: string | null
   idCard?: string | null
   lineUserId?: string | null
+  inviteToken?: string | null
   address?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -367,6 +384,7 @@ export type TenantUpdateManyMutationInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idCard?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lineUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inviteToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -380,6 +398,7 @@ export type TenantUncheckedUpdateManyInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idCard?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lineUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inviteToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -403,6 +422,7 @@ export type TenantCountOrderByAggregateInput = {
   email?: Prisma.SortOrder
   idCard?: Prisma.SortOrder
   lineUserId?: Prisma.SortOrder
+  inviteToken?: Prisma.SortOrder
   address?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -416,6 +436,7 @@ export type TenantMaxOrderByAggregateInput = {
   email?: Prisma.SortOrder
   idCard?: Prisma.SortOrder
   lineUserId?: Prisma.SortOrder
+  inviteToken?: Prisma.SortOrder
   address?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -429,6 +450,7 @@ export type TenantMinOrderByAggregateInput = {
   email?: Prisma.SortOrder
   idCard?: Prisma.SortOrder
   lineUserId?: Prisma.SortOrder
+  inviteToken?: Prisma.SortOrder
   address?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -502,6 +524,7 @@ export type TenantCreateWithoutOwnerInput = {
   email?: string | null
   idCard?: string | null
   lineUserId?: string | null
+  inviteToken?: string | null
   address?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -515,6 +538,7 @@ export type TenantUncheckedCreateWithoutOwnerInput = {
   email?: string | null
   idCard?: string | null
   lineUserId?: string | null
+  inviteToken?: string | null
   address?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -558,6 +582,7 @@ export type TenantScalarWhereInput = {
   email?: Prisma.StringNullableFilter<"Tenant"> | string | null
   idCard?: Prisma.StringNullableFilter<"Tenant"> | string | null
   lineUserId?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  inviteToken?: Prisma.StringNullableFilter<"Tenant"> | string | null
   address?: Prisma.StringNullableFilter<"Tenant"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
@@ -570,6 +595,7 @@ export type TenantCreateWithoutContractsInput = {
   email?: string | null
   idCard?: string | null
   lineUserId?: string | null
+  inviteToken?: string | null
   address?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -584,6 +610,7 @@ export type TenantUncheckedCreateWithoutContractsInput = {
   email?: string | null
   idCard?: string | null
   lineUserId?: string | null
+  inviteToken?: string | null
   address?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -612,6 +639,7 @@ export type TenantUpdateWithoutContractsInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idCard?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lineUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inviteToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -626,6 +654,7 @@ export type TenantUncheckedUpdateWithoutContractsInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idCard?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lineUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inviteToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -638,6 +667,7 @@ export type TenantCreateManyOwnerInput = {
   email?: string | null
   idCard?: string | null
   lineUserId?: string | null
+  inviteToken?: string | null
   address?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -650,6 +680,7 @@ export type TenantUpdateWithoutOwnerInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idCard?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lineUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inviteToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -663,6 +694,7 @@ export type TenantUncheckedUpdateWithoutOwnerInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idCard?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lineUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inviteToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -676,6 +708,7 @@ export type TenantUncheckedUpdateManyWithoutOwnerInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idCard?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lineUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inviteToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -720,6 +753,7 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   email?: boolean
   idCard?: boolean
   lineUserId?: boolean
+  inviteToken?: boolean
   address?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -736,6 +770,7 @@ export type TenantSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   email?: boolean
   idCard?: boolean
   lineUserId?: boolean
+  inviteToken?: boolean
   address?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -750,6 +785,7 @@ export type TenantSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   email?: boolean
   idCard?: boolean
   lineUserId?: boolean
+  inviteToken?: boolean
   address?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -764,12 +800,13 @@ export type TenantSelectScalar = {
   email?: boolean
   idCard?: boolean
   lineUserId?: boolean
+  inviteToken?: boolean
   address?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerId" | "name" | "phone" | "email" | "idCard" | "lineUserId" | "address" | "createdAt" | "updatedAt", ExtArgs["result"]["tenant"]>
+export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerId" | "name" | "phone" | "email" | "idCard" | "lineUserId" | "inviteToken" | "address" | "createdAt" | "updatedAt", ExtArgs["result"]["tenant"]>
 export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.Tenant$ownerArgs<ExtArgs>
   contracts?: boolean | Prisma.Tenant$contractsArgs<ExtArgs>
@@ -796,6 +833,7 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     email: string | null
     idCard: string | null
     lineUserId: string | null
+    inviteToken: string | null
     address: string | null
     createdAt: Date
     updatedAt: Date
@@ -1231,6 +1269,7 @@ export interface TenantFieldRefs {
   readonly email: Prisma.FieldRef<"Tenant", 'String'>
   readonly idCard: Prisma.FieldRef<"Tenant", 'String'>
   readonly lineUserId: Prisma.FieldRef<"Tenant", 'String'>
+  readonly inviteToken: Prisma.FieldRef<"Tenant", 'String'>
   readonly address: Prisma.FieldRef<"Tenant", 'String'>
   readonly createdAt: Prisma.FieldRef<"Tenant", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Tenant", 'DateTime'>
