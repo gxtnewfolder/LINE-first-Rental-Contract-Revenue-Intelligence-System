@@ -11,21 +11,23 @@ import {
   type ContractTemplateData,
 } from './templates/rental-contract';
 
-/**
- * Format date to Thai format
- */
+const THAI_MONTHS = [
+  'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน',
+  'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม',
+  'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม',
+];
+
+function thaiDateParts(date: Date) {
+  return {
+    day: String(date.getDate()),
+    month: THAI_MONTHS[date.getMonth()],
+    year: String(date.getFullYear() + 543),
+    full: `${date.getDate()} ${THAI_MONTHS[date.getMonth()]} ${date.getFullYear() + 543}`,
+  };
+}
+
 function formatThaiDate(date: Date): string {
-  const thaiMonths = [
-    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน',
-    'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม',
-    'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม',
-  ];
-  
-  const day = date.getDate();
-  const month = thaiMonths[date.getMonth()];
-  const year = date.getFullYear() + 543; // Buddhist year
-  
-  return `${day} ${month} ${year}`;
+  return thaiDateParts(date).full;
 }
 
 /**
@@ -54,10 +56,17 @@ export async function generateContractHtml(contractId: string): Promise<string> 
     throw new Error('Contract not found');
   }
 
+  const today = thaiDateParts(new Date());
+  const start = thaiDateParts(contract.startDate);
+  const end = thaiDateParts(contract.endDate);
+
   const templateData: ContractTemplateData = {
     contractId: contract.id.slice(-8).toUpperCase(),
     contractVersion: contract.version,
-    contractDate: formatThaiDate(new Date()),
+    contractDate: today.full,
+    contractDay: today.day,
+    contractMonth: today.month,
+    contractYear: today.year,
     contractPlace: contract.room.building.name,
 
     buildingName: contract.room.building.name,
@@ -77,14 +86,21 @@ export async function generateContractHtml(contractId: string): Promise<string> 
     tenantSubDistrict: '-',
     tenantDistrict: '-',
     tenantProvince: contract.tenant.address || '-',
-    tenantIdCard: contract.tenant.idCard || 'X-XXXX-XXXXX-XX-X',
+    tenantIdCard: contract.tenant.idCard || '.................................',
     tenantIdCardIssuedBy: 'สำนักงานเขต/อำเภอ',
     tenantPhone: contract.tenant.phone,
-    tenantAddress: contract.tenant.address || 'ไม่ระบุ',
+    tenantAddress: contract.tenant.address || '-',
 
-    startDate: formatThaiDate(contract.startDate),
-    endDate: formatThaiDate(contract.endDate),
+    startDate: start.full,
+    endDate: end.full,
+    startDay: start.day,
+    startMonth: start.month,
+    startYear: start.year,
+    endDay: end.day,
+    endMonth: end.month,
+    endYear: end.year,
     durationMonths: getMonthsDiff(contract.startDate, contract.endDate),
+
     rentAmountTHB: contract.rentAmountTHB,
     rentAmountText: numberToThaiText(contract.rentAmountTHB),
     depositTHB: contract.depositTHB,
