@@ -11,73 +11,49 @@ async function findTenantByLineId(lineUserId: string) {
   return prisma.tenant.findUnique({ where: { lineUserId } });
 }
 
-function registrationFlexMessage(): LineMessage {
-  const liffId = config.liff.id;
-  const liffUrl = liffId
-    ? `https://liff.line.me/${liffId}`
-    : `${config.app.url}/tenant/register`;
+// Welcome card for new users — focuses on owner sign-up
+function ownerWelcomeFlexMessage(): LineMessage {
+  const dashboardUrl = config.app.url;
 
   return {
     type: 'flex',
-    altText: 'ลงทะเบียนเพื่อดูข้อมูลสัญญาและค่าเช่า',
+    altText: 'ยินดีต้อนรับสู่ HaTy — ระบบจัดการเช่าที่พัก',
     contents: {
       type: 'bubble',
-      size: 'kilo',
+      size: 'mega',
       header: {
         type: 'box',
         layout: 'vertical',
-        backgroundColor: '#06C755',
-        paddingAll: '16px',
+        backgroundColor: '#136960',
+        paddingAll: '20px',
         contents: [
-          {
-            type: 'text',
-            text: 'HaTy หาที่',
-            color: '#ffffff',
-            weight: 'bold',
-            size: 'lg',
-          },
-          {
-            type: 'text',
-            text: 'ระบบจัดการเช่าที่พัก',
-            color: '#ffffff',
-            size: 'xs',
-            margin: 'xs',
-          },
+          { type: 'text', text: 'HaTy หาที่', color: '#ffffff', weight: 'bold', size: 'xl' },
+          { type: 'text', text: 'ระบบจัดการเช่าที่พัก · ฟรีเริ่มต้น', color: '#ffffffcc', size: 'sm', margin: 'xs' },
         ],
       },
       body: {
         type: 'box',
         layout: 'vertical',
         spacing: 'md',
-        paddingAll: '16px',
+        paddingAll: '20px',
         contents: [
+          { type: 'text', text: 'จัดการห้องเช่าง่ายขึ้น 10 เท่า 🏠', weight: 'bold', size: 'md' },
+          { type: 'text', text: 'ครบทุกอย่างในที่เดียว ตั้งแต่สัญญาจนถึงรับเงิน', wrap: true, size: 'sm', color: '#666666' },
+          { type: 'separator', margin: 'lg' },
           {
-            type: 'text',
-            text: 'สวัสดีจากเจ้าของห้อง! 👋',
-            weight: 'bold',
-            size: 'md',
-          },
-          {
-            type: 'text',
-            text: 'ลงทะเบียนเพื่อดูข้อมูลสัญญา ค่าเช่า และรับการแจ้งเตือนผ่าน LINE ได้เลย',
-            wrap: true,
-            size: 'sm',
-            color: '#555555',
-          },
-          {
-            type: 'separator',
-            margin: 'md',
-          },
-          {
-            type: 'box',
-            layout: 'vertical',
-            spacing: 'xs',
-            margin: 'md',
+            type: 'box', layout: 'vertical', spacing: 'sm', margin: 'lg',
             contents: [
-              { type: 'text', text: '💰 เช็คยอดค่าเช่า', size: 'sm', color: '#333333' },
-              { type: 'text', text: '📄 ดูสัญญาของคุณ', size: 'sm', color: '#333333' },
-              { type: 'text', text: '📊 ประวัติการชำระ', size: 'sm', color: '#333333' },
-              { type: 'text', text: '🔔 รับแจ้งเตือนอัตโนมัติ', size: 'sm', color: '#333333' },
+              { type: 'text', text: '📄 สร้างสัญญาเช่าดิจิทัลได้เลย', size: 'sm', color: '#333333' },
+              { type: 'text', text: '✍️ ส่งให้ผู้เช่าเซ็นผ่านลิงก์', size: 'sm', color: '#333333' },
+              { type: 'text', text: '💰 ติดตามค่าเช่าและการชำระเงิน', size: 'sm', color: '#333333' },
+              { type: 'text', text: '🤖 AI วิเคราะห์รายได้และแนะนำ', size: 'sm', color: '#333333' },
+            ],
+          },
+          {
+            type: 'box', layout: 'horizontal', spacing: 'md', margin: 'lg',
+            contents: [
+              { type: 'box', layout: 'vertical', contents: [{ type: 'text', text: 'ฟรี', weight: 'bold', color: '#136960', size: 'lg', align: 'center' }, { type: 'text', text: '1 ตึก · 5 ห้อง', size: 'xs', color: '#666666', align: 'center' }], backgroundColor: '#e8f5f3', cornerRadius: '8px', paddingAll: '10px', flex: 1 },
+              { type: 'box', layout: 'vertical', contents: [{ type: 'text', text: 'Pro', weight: 'bold', color: '#ffffff', size: 'lg', align: 'center' }, { type: 'text', text: 'ไม่จำกัด', size: 'xs', color: '#ffffffcc', align: 'center' }], backgroundColor: '#136960', cornerRadius: '8px', paddingAll: '10px', flex: 1 },
             ],
           },
         ],
@@ -85,20 +61,40 @@ function registrationFlexMessage(): LineMessage {
       footer: {
         type: 'box',
         layout: 'vertical',
-        paddingAll: '12px',
+        spacing: 'sm',
+        paddingAll: '16px',
         contents: [
           {
-            type: 'button',
-            style: 'primary',
-            color: '#06C755',
-            height: 'sm',
-            action: {
-              type: 'uri',
-              label: '📱 ลงทะเบียนเลย',
-              uri: liffUrl,
-            },
+            type: 'button', style: 'primary', color: '#136960', height: 'sm',
+            action: { type: 'uri', label: '🚀 เริ่มใช้งานฟรีเลย', uri: dashboardUrl },
           },
         ],
+      },
+    },
+  } as LineMessage;
+}
+
+// Tenant-facing registration card (shown only when tenant explicitly asks)
+function tenantRegistrationFlexMessage(): LineMessage {
+  const liffId = config.liff.id;
+  const liffUrl = liffId ? `https://liff.line.me/${liffId}` : `${config.app.url}/tenant/register`;
+
+  return {
+    type: 'flex',
+    altText: 'ลงทะเบียนผู้เช่า',
+    contents: {
+      type: 'bubble',
+      size: 'kilo',
+      body: {
+        type: 'box', layout: 'vertical', spacing: 'md', paddingAll: '16px',
+        contents: [
+          { type: 'text', text: 'ลงทะเบียนผู้เช่า 📋', weight: 'bold', size: 'md' },
+          { type: 'text', text: 'เพื่อดูสัญญา ค่าเช่า และรับการแจ้งเตือน', wrap: true, size: 'sm', color: '#555555' },
+        ],
+      },
+      footer: {
+        type: 'box', layout: 'vertical', paddingAll: '12px',
+        contents: [{ type: 'button', style: 'primary', color: '#06C755', height: 'sm', action: { type: 'uri', label: '📱 ลงทะเบียนเลย', uri: liffUrl } }],
       },
     },
   } as LineMessage;
@@ -128,18 +124,20 @@ export async function POST(request: Request) {
       // ── Follow event (new friend) ────────────────────────────────
       if (event.type === 'follow') {
         if (isOwner(userId)) {
+          // Existing owner — show quick-access menu
           await replyMessage(event.replyToken, withMenu([
             textMessage('👋 สวัสดีครับ!\nกดปุ่มด้านล่างเพื่อดูข้อมูลได้เลย 👇'),
           ]));
         } else {
           const tenant = await findTenantByLineId(userId);
           if (tenant) {
+            // Registered tenant — show tenant menu
             await replyMessage(event.replyToken, tenantMenu([
               textMessage(`👋 ยินดีต้อนรับกลับมา คุณ${tenant.name}!\nกดปุ่มด้านล่างเพื่อดูข้อมูล 👇`),
             ]));
           } else {
-            // New user — show registration Flex Message with button
-            await replyMessage(event.replyToken, [registrationFlexMessage()]);
+            // Unknown — owner onboarding first
+            await replyMessage(event.replyToken, [ownerWelcomeFlexMessage()]);
           }
         }
         continue;
@@ -169,18 +167,21 @@ export async function POST(request: Request) {
           const result = await handleTenantCommand(event, tenant.id);
           await replyMessage(event.replyToken, result.messages);
         } else {
-          // Check if user is trying to register via bot command
-          const result = await handleUnregisteredTenant(event);
-          // If still not registered after command, append the registration button
           const text = event.message?.text?.trim() || '';
-          const isRegisterAttempt = /^ลงทะเบียน|^0\d{8,9}$/.test(text);
-          if (!isRegisterAttempt) {
+          const isTenantRegisterAttempt = /^ลงทะเบียน|^0\d{8,9}$/.test(text);
+          const isTenantKeyword = /ผู้เช่า|เช่า|สัญญา|ค่าเช่า/i.test(text);
+
+          if (isTenantRegisterAttempt || isTenantKeyword) {
+            // Looks like a tenant — guide to register
+            const result = await handleUnregisteredTenant(event);
+            const isPhoneAttempt = /^ลงทะเบียน|^0\d{8,9}$/.test(text);
             await replyMessage(event.replyToken, [
               ...result.messages,
-              registrationFlexMessage(),
+              ...(isPhoneAttempt ? [] : [tenantRegistrationFlexMessage()]),
             ]);
           } else {
-            await replyMessage(event.replyToken, result.messages);
+            // Default: guide to owner signup
+            await replyMessage(event.replyToken, [ownerWelcomeFlexMessage()]);
           }
         }
       }
