@@ -4,11 +4,21 @@ import crypto from 'crypto';
 
 const LINE_API_BASE = 'https://api.line.me/v2/bot';
 
+interface QuickReplyItem {
+  type: 'action';
+  action: {
+    type: 'message';
+    label: string;
+    text: string;
+  };
+}
+
 interface LineMessage {
   type: 'text' | 'flex';
   text?: string;
   altText?: string;
   contents?: object;
+  quickReply?: { items: QuickReplyItem[] };
 }
 
 interface LineEvent {
@@ -139,11 +149,32 @@ export async function pushMessage(
   }
 }
 
+const MAIN_MENU: QuickReplyItem[] = [
+  { type: 'action', action: { type: 'message', label: '💰 รายได้', text: 'รายได้เดือนนี้' } },
+  { type: 'action', action: { type: 'message', label: '🏠 ห้องว่าง', text: 'ห้องว่าง' } },
+  { type: 'action', action: { type: 'message', label: '📊 สรุป AI', text: 'สรุป' } },
+  { type: 'action', action: { type: 'message', label: '🤖 แนะนำ', text: 'แนะนำ' } },
+];
+
 /**
  * Create text message
  */
-export function textMessage(text: string): LineMessage {
-  return { type: 'text', text };
+export function textMessage(text: string, withMenu = false): LineMessage {
+  return withMenu
+    ? { type: 'text', text, quickReply: { items: MAIN_MENU } }
+    : { type: 'text', text };
+}
+
+/**
+ * Attach main menu quick replies to the last message in an array
+ */
+export function withMenu(messages: LineMessage[]): LineMessage[] {
+  if (messages.length === 0) return messages;
+  const last = messages[messages.length - 1];
+  return [
+    ...messages.slice(0, -1),
+    { ...last, quickReply: { items: MAIN_MENU } },
+  ];
 }
 
 /**

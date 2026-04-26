@@ -31,12 +31,14 @@ export default function LoginPage() {
       <div className="w-full max-w-sm space-y-8">
         {/* Brand */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary shadow-md mb-1">
-            <span className="text-xl font-black text-white">V</span>
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl brand-gradient shadow-md mb-1">
+            <span className="text-2xl font-black text-white">u</span>
           </div>
           <div>
-            <h1 className="text-3xl font-black tracking-widest uppercase text-foreground">VARA</h1>
-            <p className="text-sm text-muted-foreground mt-1">ระบบจัดการอสังหาริมทรัพย์</p>
+            <h1 className="text-3xl font-black tracking-tight text-foreground">
+              u<span className="text-primary">Sabai</span>
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">อยู่สบาย ง่ายแค่ปลายนิ้ว</p>
           </div>
         </div>
 
@@ -72,7 +74,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground">
-          VARA Property Intelligence © {new Date().getFullYear()}
+          uSabai © {new Date().getFullYear()}
         </p>
       </div>
     </div>

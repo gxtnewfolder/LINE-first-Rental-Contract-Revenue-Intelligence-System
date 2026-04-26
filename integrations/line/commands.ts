@@ -4,6 +4,7 @@ import {
   textMessage,
   incomeFlexMessage,
   vacantRoomsFlexMessage,
+  withMenu,
   isOwner,
 } from './client';
 import { roomService } from '@/services/room.service';
@@ -62,13 +63,11 @@ export async function handleCommand(event: LineEvent): Promise<CommandResult> {
     return handleAdviceCommand();
   }
 
-  // Unknown command
+  // Unknown command — show menu
   return {
-    messages: [
-      textMessage(
-        '🤔 ไม่เข้าใจคำสั่ง\n\nลองพิมพ์:\n• รายได้เดือนนี้\n• ห้องว่าง\n• สรุป\n• ช่วย'
-      ),
-    ],
+    messages: withMenu([
+      textMessage('🤔 ไม่เข้าใจคำสั่ง กดปุ่มด้านล่างได้เลย 👇'),
+    ]),
     authorized: true,
   };
 }
@@ -135,7 +134,7 @@ async function handleIncomeCommand(): Promise<CommandResult> {
   ];
 
   return {
-    messages: [
+    messages: withMenu([
       incomeFlexMessage({
         month: thaiMonths[month],
         total,
@@ -143,7 +142,7 @@ async function handleIncomeCommand(): Promise<CommandResult> {
         collected,
         pending,
       }),
-    ],
+    ]),
     authorized: true,
   };
 }
@@ -161,7 +160,7 @@ async function handleVacantCommand(): Promise<CommandResult> {
   }));
 
   return {
-    messages: [vacantRoomsFlexMessage(formattedRooms)],
+    messages: withMenu([vacantRoomsFlexMessage(formattedRooms)]),
     authorized: true,
   };
 }
@@ -173,7 +172,7 @@ async function handleSummaryCommand(): Promise<CommandResult> {
   const aiSummary = await aiService.generateMonthlySummary();
   
   return {
-    messages: [textMessage(aiSummary.content)],
+    messages: withMenu([textMessage(aiSummary.content)]),
     authorized: true,
   };
 }
@@ -186,9 +185,9 @@ async function handleAdviceCommand(): Promise<CommandResult> {
   const expiry = await aiService.generateExpiryReminder();
   
   return {
-    messages: [
-      textMessage(`🤖 AI วิเคราะห์ระบบ:\n\n${anomaly.content}\n\n${expiry.content}`)
-    ],
+    messages: withMenu([
+      textMessage(`🤖 AI วิเคราะห์ระบบ:\n\n${anomaly.content}\n\n${expiry.content}`),
+    ]),
     authorized: true,
   };
 }
@@ -198,16 +197,9 @@ async function handleAdviceCommand(): Promise<CommandResult> {
  */
 function handleHelpCommand(): Promise<CommandResult> {
   return Promise.resolve({
-    messages: [
-      textMessage(
-        '📋 คำสั่งที่ใช้ได้:\n\n' +
-          '💰 รายได้เดือนนี้\n→ ดูสรุปรายได้แบบละเอียด\n\n' +
-          '🏠 ห้องว่าง\n→ ดูห้องที่ว่างอยู่\n\n' +
-          '📊 สรุป\n→ ให้ AI สรุปภาพรวมเดือนนี้\n\n' +
-          '🤖 แนะนำ\n→ ให้ AI วิเคราะห์ความผิดปกติและแจ้งเตือน\n\n' +
-          '❓ ช่วย\n→ แสดงคำสั่งทั้งหมด'
-      ),
-    ],
+    messages: withMenu([
+      textMessage('📋 กดปุ่มด้านล่างเพื่อใช้งาน หรือพิมพ์คำสั่งได้เลย 👇'),
+    ]),
     authorized: true,
   });
 }
