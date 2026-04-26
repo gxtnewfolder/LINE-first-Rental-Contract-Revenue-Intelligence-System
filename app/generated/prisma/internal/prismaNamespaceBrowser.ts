@@ -51,6 +51,7 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  Owner: 'Owner',
   Building: 'Building',
   Room: 'Room',
   Tenant: 'Tenant',
@@ -78,8 +79,22 @@ export const TransactionIsolationLevel = {
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+export const OwnerScalarFieldEnum = {
+  id: 'id',
+  lineUserId: 'lineUserId',
+  displayName: 'displayName',
+  pictureUrl: 'pictureUrl',
+  plan: 'plan',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type OwnerScalarFieldEnum = (typeof OwnerScalarFieldEnum)[keyof typeof OwnerScalarFieldEnum]
+
+
 export const BuildingScalarFieldEnum = {
   id: 'id',
+  ownerId: 'ownerId',
   name: 'name',
   address: 'address',
   createdAt: 'createdAt',
@@ -107,6 +122,7 @@ export type RoomScalarFieldEnum = (typeof RoomScalarFieldEnum)[keyof typeof Room
 
 export const TenantScalarFieldEnum = {
   id: 'id',
+  ownerId: 'ownerId',
   name: 'name',
   phone: 'phone',
   email: 'email',

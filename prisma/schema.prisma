@@ -43,20 +43,45 @@ enum PaymentStatus {
   CANCELLED
 }
 
+enum Plan {
+  LITE  // 1 building, 5 rooms — free
+  PRO   // unlimited — paid
+}
+
 // ============================================================================
 // CORE ENTITIES
 // ============================================================================
 
+/// Platform owner (landlord account)
+model Owner {
+  id          String   @id @default(cuid())
+  lineUserId  String   @unique
+  displayName String?
+  pictureUrl  String?
+  plan        Plan     @default(LITE)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  buildings Building[]
+  tenants   Tenant[]
+
+  @@index([lineUserId])
+  @@map("owners")
+}
+
 /// Physical building
 model Building {
   id        String   @id @default(cuid())
+  ownerId   String?
   name      String   // e.g., "ตึก A", "ตึก B"
   address   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  owner Owner?  @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   rooms Room[]
 
+  @@index([ownerId])
   @@map("buildings")
 }
 
@@ -85,6 +110,7 @@ model Room {
 /// Tenant information
 model Tenant {
   id         String   @id @default(cuid())
+  ownerId    String?
   name       String
   phone      String
   email      String?
@@ -94,8 +120,10 @@ model Tenant {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
+  owner     Owner?     @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   contracts Contract[]
 
+  @@index([ownerId])
   @@index([lineUserId])
   @@map("tenants")
 }

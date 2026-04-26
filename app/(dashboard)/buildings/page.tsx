@@ -1,11 +1,13 @@
 import React from 'react';
 import { buildingService } from '@/services';
+import { getSession } from '@/lib/auth';
 import { Badge } from '@/components/ui/badge';
 import { Building2, MapPin } from 'lucide-react';
 import { AddBuildingDialog } from '@/components/add-building-dialog';
 
 export default async function BuildingsPage() {
-  const buildings = await buildingService.findAll();
+  const session = await getSession();
+  const buildings = await buildingService.findAll(session?.ownerId);
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">

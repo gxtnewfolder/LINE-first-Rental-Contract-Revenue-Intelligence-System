@@ -9,8 +9,8 @@ const sarabun = Sarabun({
 });
 
 export const metadata: Metadata = {
-  title: "uSabai — อยู่สบาย",
-  description: "ระบบจัดการห้องเช่า อยู่สบาย ง่ายแค่ปลายนิ้ว",
+  title: "HaTy — หาที่",
+  description: "ระบบจัดการห้องเช่า หาที่ง่าย จัดการได้",
 };
 
 export default function RootLayout({

@@ -1,6 +1,7 @@
 // Verify LIFF ID token and create session
 import { NextResponse } from 'next/server';
 import { createSession } from '@/lib/auth';
+import { upsertOwner } from '@/lib/owner';
 import { config } from '@/lib/config';
 
 type LineVerifyResponse = {
@@ -42,10 +43,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'unauthorized' }, { status: 403 });
     }
 
+    const owner = await upsertOwner(profile.sub, profile.name, profile.picture);
+
     await createSession({
       lineUserId: profile.sub,
       displayName: profile.name,
       pictureUrl: profile.picture,
+      ownerId: owner.id,
+      plan: owner.plan,
     });
 
     return NextResponse.json({ ok: true });

@@ -33,7 +33,7 @@ export async function POST() {
   }
 
   const ok = await pushMessage(ownerIds[0], [
-    textMessage('✅ uSabai เชื่อมต่อสำเร็จ!\n\nพิมพ์ "ช่วย" เพื่อดูคำสั่งทั้งหมด'),
+    textMessage('✅ HaTy เชื่อมต่อสำเร็จ!\n\nพิมพ์ "ช่วย" เพื่อดูคำสั่งทั้งหมด'),
   ]);
 
   if (!ok) {
