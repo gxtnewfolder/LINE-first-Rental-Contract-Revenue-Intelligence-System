@@ -43,11 +43,6 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Allow root redirect to work naturally
-  if (pathname === '/') {
-    return NextResponse.next();
-  }
-
   const token = request.cookies.get(SESSION_COOKIE)?.value;
   const secret = process.env.SESSION_SECRET || 'dev-session-secret-change-in-production';
   const isAuthenticated = token ? verifySessionToken(token, secret) : false;
@@ -60,16 +55,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Dashboard and other protected pages: redirect to login
+  // All other routes require authentication
   if (!isAuthenticated) {
     const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('from', pathname);
+    if (pathname !== '/') loginUrl.searchParams.set('from', pathname);
     return NextResponse.redirect(loginUrl);
-  }
-
-  // Logged-in user accessing /login → redirect to dashboard
-  if (pathname === '/login' && isAuthenticated) {
-    return NextResponse.redirect(new URL('/', request.url));
   }
 
   return NextResponse.next();

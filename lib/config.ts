@@ -32,10 +32,10 @@ export const config = {
     isDev: process.env.NODE_ENV !== 'production',
   },
 
-  // Admin credentials for web dashboard
-  admin: {
-    username: process.env.ADMIN_USERNAME || 'admin',
-    passwordHash: process.env.ADMIN_PASSWORD_HASH || '',
+  // LINE Login channel (OAuth2 for web dashboard)
+  lineLogin: {
+    channelId: process.env.LINE_LOGIN_CHANNEL_ID || '',
+    channelSecret: process.env.LINE_LOGIN_CHANNEL_SECRET || '',
     sessionSecret: process.env.SESSION_SECRET || 'dev-session-secret-change-in-production',
   },
 
