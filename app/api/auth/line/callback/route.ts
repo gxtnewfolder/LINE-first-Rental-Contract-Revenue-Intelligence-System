@@ -78,6 +78,7 @@ export async function GET(request: Request) {
 
     // Check if this LINE user is an authorized owner
     if (!config.line.ownerLineIds.includes(profile.userId)) {
+      console.log(`[LINE Login] Unauthorized userId: ${profile.userId} (${profile.displayName}) — add to OWNER_LINE_IDS`);
       return NextResponse.redirect(new URL('/login?error=unauthorized', config.app.url));
     }
 

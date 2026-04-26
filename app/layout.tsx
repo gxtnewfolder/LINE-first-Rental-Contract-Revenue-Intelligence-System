@@ -8,17 +8,15 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "RentalAI | Revenue Intelligence System",
-  description: "AI-powered rental contract and revenue management system",
+  title: "VARA — Property Intelligence",
+  description: "Property management and revenue intelligence platform",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="th" className="dark">
       <body className={`${inter.variable} antialiased font-sans bg-background text-foreground min-h-screen`}>
         {children}
       </body>

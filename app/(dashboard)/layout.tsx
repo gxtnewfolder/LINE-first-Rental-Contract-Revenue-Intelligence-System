@@ -3,115 +3,95 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  Building2, 
-  Key, 
-  Users, 
-  FileText, 
-  TrendingUp, 
-  Bell, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Building2,
+  Key,
+  Users,
+  FileText,
+  BarChart3,
   LogOut,
-  Home
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const NAV_ITEMS = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/', label: 'Overview', icon: LayoutDashboard },
   { href: '/buildings', label: 'Buildings', icon: Building2 },
   { href: '/rooms', label: 'Rooms', icon: Key },
   { href: '/tenants', label: 'Tenants', icon: Users },
   { href: '/contracts', label: 'Contracts', icon: FileText },
-  { href: '/analytics', label: 'Analytics', icon: TrendingUp },
+  { href: '/analytics', label: 'Analytics', icon: BarChart3 },
 ];
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const currentPage = NAV_ITEMS.find(i => i.href === pathname)?.label ?? 'Page';
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
+
       {/* Sidebar */}
-      <aside className="w-72 bg-card border-r flex flex-col p-8 transition-transform duration-300">
-        <div className="flex items-center gap-4 mb-12 px-3">
-          <div className="p-2 rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
-            <Home className="w-6 h-6" />
+      <aside className="w-60 shrink-0 flex flex-col border-r border-border bg-card">
+        {/* Logo */}
+        <div className="h-14 flex items-center gap-2.5 px-5 border-b border-border">
+          <div className="w-6 h-6 rounded bg-primary flex items-center justify-center shrink-0">
+            <span className="text-[10px] font-black text-primary-foreground tracking-tight">V</span>
           </div>
-          <span className="text-2xl font-extrabold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-            RentalAI
-          </span>
+          <span className="text-sm font-black tracking-widest text-foreground uppercase">VARA</span>
         </div>
-        
-        <nav className="flex-1 flex flex-col gap-2">
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
+
+        {/* Nav */}
+        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+          {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+            const active = pathname === href;
             return (
-              <Link 
-                key={item.href} 
-                href={item.href} 
+              <Link
+                key={href}
+                href={href}
                 className={cn(
-                  "flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-medium transition-all duration-200 group",
-                  isActive 
-                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25" 
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                  active
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                 )}
               >
-                <Icon className={cn(
-                  "w-5 h-5 transition-transform duration-200 group-hover:scale-110",
-                  isActive ? "text-primary-foreground" : "text-muted-foreground"
-                )} />
-                {item.label}
+                <Icon className={cn('w-4 h-4 shrink-0', active ? 'text-primary' : '')} />
+                {label}
               </Link>
             );
           })}
         </nav>
-        
-        <div className="pt-8 mt-auto border-t">
-          <div className="flex items-center gap-4 group cursor-pointer p-2 rounded-xl hover:bg-secondary transition-all">
-            <Avatar className="h-10 w-10 border-2 border-primary/20">
-              <AvatarImage src="" />
-              <AvatarFallback className="bg-primary/10 text-primary font-bold">AD</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 overflow-hidden">
-              <p className="text-sm font-semibold truncate">Admin</p>
-              <p className="text-xs text-muted-foreground truncate">Owner</p>
-            </div>
-            <Link href="/login" className="text-muted-foreground hover:text-destructive transition-colors p-2">
-              <LogOut className="w-5 h-5" />
-            </Link>
-          </div>
+
+        {/* Bottom */}
+        <div className="px-3 py-4 border-t border-border">
+          <form action="/api/auth/logout" method="POST">
+            <button
+              type="submit"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-colors"
+            >
+              <LogOut className="w-4 h-4 shrink-0" />
+              Sign Out
+            </button>
+          </form>
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Main */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-20 px-10 flex items-center justify-between border-b bg-background/80 backdrop-blur-xl z-10">
+
+        {/* Topbar */}
+        <header className="h-14 shrink-0 flex items-center justify-between px-6 border-b border-border bg-card">
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">Admin</span>
-            <span className="text-muted-foreground">/</span>
-            <span className="font-semibold text-foreground">
-              {NAV_ITEMS.find(i => i.href === pathname)?.label || 'Page'}
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-             <Button variant="ghost" size="icon" className="rounded-full hover:bg-secondary">
-               <Bell className="w-5 h-5" />
-             </Button>
-             <Button variant="ghost" size="icon" className="rounded-full hover:bg-secondary">
-               <Settings className="w-5 h-5" />
-             </Button>
+            <span className="text-muted-foreground">VARA</span>
+            <span className="text-border">/</span>
+            <span className="font-semibold text-foreground">{currentPage}</span>
           </div>
         </header>
-        
-        <main className="flex-1 overflow-y-auto p-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          {children}
+
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-8">
+            {children}
+          </div>
         </main>
       </div>
     </div>
