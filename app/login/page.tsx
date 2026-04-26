@@ -58,8 +58,8 @@ export default function LoginPage() {
           ) : (
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground text-center leading-relaxed">
-                เข้าสู่ระบบด้วย LINE account<br />
-                <span className="text-xs">เฉพาะผู้ที่ได้รับอนุญาตเท่านั้น</span>
+                สมัครและเข้าสู่ระบบด้วย LINE<br />
+                <span className="text-xs">ฟรีเริ่มต้น · ไม่ต้องใช้บัตรเครดิต</span>
               </p>
               <a
                 href="/api/auth/line"
