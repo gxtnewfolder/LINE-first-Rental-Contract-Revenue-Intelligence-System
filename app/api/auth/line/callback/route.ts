@@ -77,12 +77,7 @@ export async function GET(request: Request) {
     const token = await exchangeCodeForToken(code);
     const profile = await getLineProfile(token.access_token);
 
-    // Check if this LINE user is an authorized owner
-    if (!config.line.ownerLineIds.includes(profile.userId)) {
-      console.log(`[LINE Login] Unauthorized userId: ${profile.userId} (${profile.displayName}) — add to OWNER_LINE_IDS`);
-      return NextResponse.redirect(new URL('/login?error=unauthorized', config.app.url));
-    }
-
+    // Any LINE user can sign up — upsertOwner creates a Lite account automatically
     const owner = await upsertOwner(profile.userId, profile.displayName, profile.pictureUrl);
 
     await createSession({
