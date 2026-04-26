@@ -1,11 +1,13 @@
 import React from 'react';
 import { tenantService } from '@/services';
+import { getSession } from '@/lib/auth';
 import { Badge } from '@/components/ui/badge';
 import { Phone, Mail, MessageSquare } from 'lucide-react';
 import { AddTenantDialog } from '@/components/add-tenant-dialog';
 
 export default async function TenantsPage() {
-  const tenants = await tenantService.findAll();
+  const session = await getSession();
+  const tenants = await tenantService.findAll(session?.ownerId);
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">

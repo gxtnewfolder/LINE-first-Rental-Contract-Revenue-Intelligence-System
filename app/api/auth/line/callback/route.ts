@@ -1,6 +1,7 @@
 // Handle LINE Login OAuth2 callback
 import { NextResponse } from 'next/server';
 import { createSession, verifyOAuthState } from '@/lib/auth';
+import { upsertOwner } from '@/lib/owner';
 import { config } from '@/lib/config';
 
 type LineTokenResponse = {
@@ -82,10 +83,14 @@ export async function GET(request: Request) {
       return NextResponse.redirect(new URL('/login?error=unauthorized', config.app.url));
     }
 
+    const owner = await upsertOwner(profile.userId, profile.displayName, profile.pictureUrl);
+
     await createSession({
       lineUserId: profile.userId,
       displayName: profile.displayName,
       pictureUrl: profile.pictureUrl,
+      ownerId: owner.id,
+      plan: owner.plan,
     });
 
     return NextResponse.redirect(new URL('/', config.app.url));

@@ -11,6 +11,8 @@ export type SessionUser = {
   lineUserId: string;
   displayName: string;
   pictureUrl?: string;
+  ownerId: string;
+  plan: 'LITE' | 'PRO';
 };
 
 function signToken(payload: string): string {

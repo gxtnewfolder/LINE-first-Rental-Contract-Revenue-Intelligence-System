@@ -51,7 +51,7 @@ export async function POST(request: Request) {
         await replyMessage(event.replyToken, withMenu([
           {
             type: 'text',
-            text: '👋 สวัสดีครับ! ยินดีต้อนรับสู่ uSabai\nกดปุ่มด้านล่างเพื่อเริ่มใช้งานได้เลย 👇',
+            text: '👋 สวัสดีครับ! ยินดีต้อนรับสู่ HaTy (หาที่)\nกดปุ่มด้านล่างเพื่อเริ่มใช้งานได้เลย 👇',
           },
         ]));
       }

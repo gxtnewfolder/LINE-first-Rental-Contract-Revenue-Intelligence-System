@@ -1,14 +1,16 @@
 import React from 'react';
 import { roomService, buildingService } from '@/services';
+import { getSession } from '@/lib/auth';
 import { Badge } from '@/components/ui/badge';
 import { Key, Building2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AddRoomDialog } from '@/components/add-room-dialog';
 
 export default async function RoomsPage() {
+  const session = await getSession();
   const [rooms, buildings] = await Promise.all([
-    roomService.findAll(),
-    buildingService.findAll(),
+    roomService.findAll({ ownerId: session?.ownerId }),
+    buildingService.findAll(session?.ownerId),
   ]);
 
   const statusStyle: Record<string, string> = {

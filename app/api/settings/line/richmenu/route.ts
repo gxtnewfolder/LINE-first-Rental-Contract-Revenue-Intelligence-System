@@ -41,7 +41,7 @@ export async function POST(request: Request) {
   const richMenuBody = {
     size: { width: 2500, height: 843 },
     selected: true,
-    name: 'uSabai Menu',
+    name: 'HaTy Menu',
     chatBarText: '📋 เมนูหลัก',
     areas: [
       {

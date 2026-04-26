@@ -48,3 +48,11 @@ export const PaymentStatus = {
 } as const
 
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
+
+
+export const Plan = {
+  LITE: 'LITE',
+  PRO: 'PRO'
+} as const
+
+export type Plan = (typeof Plan)[keyof typeof Plan]

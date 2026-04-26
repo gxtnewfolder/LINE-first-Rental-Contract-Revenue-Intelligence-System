@@ -9,9 +9,10 @@ export type CreateTenantInput = {
   idCard?: string;
   lineUserId?: string;
   address?: string;
+  ownerId?: string;
 };
 
-export type UpdateTenantInput = Partial<CreateTenantInput>;
+export type UpdateTenantInput = Partial<Omit<CreateTenantInput, 'ownerId'>>;
 
 export type TenantWithContracts = Tenant & {
   _count: { contracts: number };
@@ -21,13 +22,10 @@ export const tenantService = {
   /**
    * Get all tenants with contract counts
    */
-  async findAll(): Promise<TenantWithContracts[]> {
+  async findAll(ownerId?: string): Promise<TenantWithContracts[]> {
     return prisma.tenant.findMany({
-      include: {
-        _count: {
-          select: { contracts: true },
-        },
-      },
+      where: ownerId ? { ownerId } : {},
+      include: { _count: { select: { contracts: true } } },
       orderBy: { name: 'asc' },
     });
   },
@@ -114,6 +112,7 @@ export const tenantService = {
         idCard: data.idCard?.trim() || null,
         lineUserId: data.lineUserId || null,
         address: data.address?.trim() || null,
+        ownerId: data.ownerId ?? null,
       },
     });
   },

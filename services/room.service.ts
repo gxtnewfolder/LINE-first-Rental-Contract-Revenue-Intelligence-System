@@ -22,11 +22,12 @@ export const roomService = {
   /**
    * Get all rooms with building info
    */
-  async findAll(filters?: { buildingId?: string; status?: RoomStatus }): Promise<RoomWithBuilding[]> {
+  async findAll(filters?: { buildingId?: string; status?: RoomStatus; ownerId?: string }): Promise<RoomWithBuilding[]> {
     return prisma.room.findMany({
       where: {
         ...(filters?.buildingId && { buildingId: filters.buildingId }),
         ...(filters?.status && { status: filters.status }),
+        ...(filters?.ownerId && { building: { ownerId: filters.ownerId } }),
       },
       include: {
         building: {
@@ -44,8 +45,12 @@ export const roomService = {
   /**
    * Get vacant rooms only
    */
-  async findVacant(): Promise<RoomWithBuilding[]> {
-    return this.findAll({ status: 'VACANT' });
+  async findVacant(ownerId?: string): Promise<RoomWithBuilding[]> {
+    return this.findAll({ status: 'VACANT', ownerId });
+  },
+
+  async countByOwner(ownerId: string): Promise<number> {
+    return prisma.room.count({ where: { building: { ownerId } } });
   },
 
   /**

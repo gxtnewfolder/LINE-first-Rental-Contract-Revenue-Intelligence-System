@@ -32,13 +32,13 @@ export default function LoginPage() {
         {/* Brand */}
         <div className="text-center space-y-3">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl brand-gradient shadow-md mb-1">
-            <span className="text-2xl font-black text-white">u</span>
+            <span className="text-2xl font-black text-white">H</span>
           </div>
           <div>
             <h1 className="text-3xl font-black tracking-tight text-foreground">
-              u<span className="text-primary">Sabai</span>
+              Ha<span className="text-primary">Ty</span>
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">อยู่สบาย ง่ายแค่ปลายนิ้ว</p>
+            <p className="text-sm text-muted-foreground mt-1">หาที่ง่าย จัดการได้</p>
           </div>
         </div>
 
@@ -74,7 +74,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground">
-          uSabai © {new Date().getFullYear()}
+          HaTy © {new Date().getFullYear()}
         </p>
       </div>
     </div>
