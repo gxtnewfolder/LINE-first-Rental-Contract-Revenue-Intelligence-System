@@ -31,6 +31,20 @@ export const config = {
     nodeEnv: process.env.NODE_ENV || 'development',
     isDev: process.env.NODE_ENV !== 'production',
   },
+
+  // Admin credentials for web dashboard
+  admin: {
+    username: process.env.ADMIN_USERNAME || 'admin',
+    passwordHash: process.env.ADMIN_PASSWORD_HASH || '',
+    sessionSecret: process.env.SESSION_SECRET || 'dev-session-secret-change-in-production',
+  },
+
+  // Owner info for PDF contract generation
+  owner: {
+    name: process.env.OWNER_NAME || 'เจ้าของตึก',
+    address: process.env.OWNER_ADDRESS || 'กรุงเทพมหานคร',
+    idCard: process.env.OWNER_ID_CARD || 'X-XXXX-XXXXX-XX-X',
+  },
 } as const;
 
 export type Config = typeof config;

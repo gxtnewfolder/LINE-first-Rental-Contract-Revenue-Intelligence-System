@@ -3,19 +3,13 @@ import { writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 import prisma from '@/lib/db';
+import { config } from '@/lib/config';
 import {
   renderTemplate,
   defaultContractTemplate,
   numberToThaiText,
   type ContractTemplateData,
 } from './templates/rental-contract';
-
-// Owner info (would come from config in production)
-const OWNER_INFO = {
-  name: 'เจ้าของตึก', // Replace with actual owner name
-  address: 'กรุงเทพมหานคร',
-  idCard: 'X-XXXX-XXXXX-XX-X',
-};
 
 /**
  * Format date to Thai format
@@ -70,9 +64,9 @@ export async function generateContractHtml(contractId: string): Promise<string> 
     roomSizeSqm: contract.room.sizeSqm,
     roomAddress: contract.room.building.address || 'กรุงเทพมหานคร',
     
-    ownerName: OWNER_INFO.name,
-    ownerAddress: OWNER_INFO.address,
-    ownerIdCard: OWNER_INFO.idCard,
+    ownerName: config.owner.name,
+    ownerAddress: config.owner.address,
+    ownerIdCard: config.owner.idCard,
     
     tenantName: contract.tenant.name,
     tenantPhone: contract.tenant.phone,

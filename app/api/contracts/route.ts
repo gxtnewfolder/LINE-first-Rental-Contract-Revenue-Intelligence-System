@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { contractService } from '@/services/contract.service';
 import type { ContractStatus } from '@/app/generated/prisma/client';
+import { CreateContractSchema } from '@/lib/validations/contract.schema';
 
 export async function GET(request: Request) {
   try {
@@ -9,7 +10,7 @@ export async function GET(request: Request) {
     const status = searchParams.get('status') as ContractStatus | undefined;
     const roomId = searchParams.get('roomId') || undefined;
     const tenantId = searchParams.get('tenantId') || undefined;
-    
+
     const contracts = await contractService.findAll({ status, roomId, tenantId });
     return NextResponse.json(contracts);
   } catch (error) {
@@ -24,7 +25,15 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const contract = await contractService.create(body);
+    const parsed = CreateContractSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 });
+    }
+    const contract = await contractService.create({
+      ...parsed.data,
+      startDate: new Date(parsed.data.startDate),
+      endDate: new Date(parsed.data.endDate),
+    });
     return NextResponse.json(contract, { status: 201 });
   } catch (error) {
     console.error('POST /api/contracts error:', error);

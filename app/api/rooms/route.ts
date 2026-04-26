@@ -2,13 +2,14 @@
 import { NextResponse } from 'next/server';
 import { roomService } from '@/services/room.service';
 import type { RoomStatus } from '@/app/generated/prisma/client';
+import { CreateRoomSchema } from '@/lib/validations/room.schema';
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const buildingId = searchParams.get('buildingId') || undefined;
     const status = searchParams.get('status') as RoomStatus | undefined;
-    
+
     const rooms = await roomService.findAll({ buildingId, status });
     return NextResponse.json(rooms);
   } catch (error) {
@@ -23,7 +24,11 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const room = await roomService.create(body);
+    const parsed = CreateRoomSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 });
+    }
+    const room = await roomService.create(parsed.data);
     return NextResponse.json(room, { status: 201 });
   } catch (error) {
     console.error('POST /api/rooms error:', error);
