@@ -58,21 +58,30 @@ export async function generateContractHtml(contractId: string): Promise<string> 
     contractId: contract.id.slice(-8).toUpperCase(),
     contractVersion: contract.version,
     contractDate: formatThaiDate(new Date()),
-    
+    contractPlace: contract.room.building.name,
+
     buildingName: contract.room.building.name,
     roomNumber: contract.room.roomNumber,
     roomSizeSqm: contract.room.sizeSqm,
     roomAddress: contract.room.building.address || 'กรุงเทพมหานคร',
-    
+
     ownerName: config.owner.name,
     ownerAddress: config.owner.address,
     ownerIdCard: config.owner.idCard,
-    
+
     tenantName: contract.tenant.name,
-    tenantPhone: contract.tenant.phone,
+    tenantHouseNo: '-',
+    tenantMoo: '-',
+    tenantSoi: '-',
+    tenantRoad: '-',
+    tenantSubDistrict: '-',
+    tenantDistrict: '-',
+    tenantProvince: contract.tenant.address || '-',
     tenantIdCard: contract.tenant.idCard || 'X-XXXX-XXXXX-XX-X',
+    tenantIdCardIssuedBy: 'สำนักงานเขต/อำเภอ',
+    tenantPhone: contract.tenant.phone,
     tenantAddress: contract.tenant.address || 'ไม่ระบุ',
-    
+
     startDate: formatThaiDate(contract.startDate),
     endDate: formatThaiDate(contract.endDate),
     durationMonths: getMonthsDiff(contract.startDate, contract.endDate),
@@ -81,6 +90,10 @@ export async function generateContractHtml(contractId: string): Promise<string> 
     depositTHB: contract.depositTHB,
     depositText: numberToThaiText(contract.depositTHB),
     paymentDueDay: 5,
+
+    electricityRate: '7 บาทต่อหน่วย',
+    waterRate: '18 บาทต่อหน่วย',
+    penaltyPerDay: 500,
   };
 
   return renderTemplate(defaultContractTemplate, templateData);
