@@ -1,7 +1,7 @@
 // LINE webhook endpoint
 import { NextResponse } from 'next/server';
 import { validateWebhookRequest } from '@/integrations/line/verify';
-import { replyMessage, type LineWebhookBody } from '@/integrations/line/client';
+import { replyMessage, withMenu, type LineWebhookBody } from '@/integrations/line/client';
 import { handleCommand } from '@/integrations/line/commands';
 import { config } from '@/lib/config';
 
@@ -29,6 +29,15 @@ export async function POST(request: Request) {
     for (const event of body.events) {
       // Only handle text messages
       if (event.type === 'message' && event.message?.type === 'text') {
+        // Special: anyone can ask for their user ID (for initial setup)
+        if (event.message.text?.trim().toLowerCase() === 'myid') {
+          await replyMessage(event.replyToken, [{
+            type: 'text',
+            text: `🪪 LINE User ID ของคุณ:\n\n${event.source.userId}\n\nคัดลอกไปใส่ใน OWNER_LINE_IDS ใน .env.local`,
+          }]);
+          continue;
+        }
+
         const result = await handleCommand(event);
 
         // Send reply
@@ -39,14 +48,12 @@ export async function POST(request: Request) {
 
       // Handle follow event (new friend)
       if (event.type === 'follow') {
-        await replyMessage(event.replyToken, [
+        await replyMessage(event.replyToken, withMenu([
           {
             type: 'text',
-            text:
-              '👋 สวัสดีค่ะ! ยินดีต้อนรับสู่ระบบจัดการการเช่า\n\n' +
-              'พิมพ์ "ช่วย" เพื่อดูคำสั่งที่ใช้ได้',
+            text: '👋 สวัสดีครับ! ยินดีต้อนรับสู่ uSabai\nกดปุ่มด้านล่างเพื่อเริ่มใช้งานได้เลย 👇',
           },
-        ]);
+        ]));
       }
     }
 

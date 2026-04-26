@@ -31,6 +31,20 @@ export const config = {
     nodeEnv: process.env.NODE_ENV || 'development',
     isDev: process.env.NODE_ENV !== 'production',
   },
+
+  // LINE Login channel (OAuth2 for web dashboard)
+  lineLogin: {
+    channelId: process.env.LINE_LOGIN_CHANNEL_ID || '',
+    channelSecret: process.env.LINE_LOGIN_CHANNEL_SECRET || '',
+    sessionSecret: process.env.SESSION_SECRET || 'dev-session-secret-change-in-production',
+  },
+
+  // Owner info for PDF contract generation
+  owner: {
+    name: process.env.OWNER_NAME || 'เจ้าของตึก',
+    address: process.env.OWNER_ADDRESS || 'กรุงเทพมหานคร',
+    idCard: process.env.OWNER_ID_CARD || 'X-XXXX-XXXXX-XX-X',
+  },
 } as const;
 
 export type Config = typeof config;

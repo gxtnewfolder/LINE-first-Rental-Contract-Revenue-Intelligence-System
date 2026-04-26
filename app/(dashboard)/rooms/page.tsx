@@ -1,118 +1,112 @@
 import React from 'react';
-import { roomService } from '@/services';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { roomService, buildingService } from '@/services';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  Edit3, 
-  Eye, 
-  Building2, 
-  Layers, 
-  Key,
-  MoreVertical
-} from 'lucide-react';
+import { Key, Building2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AddRoomDialog } from '@/components/add-room-dialog';
 
 export default async function RoomsPage() {
-  const rooms = await roomService.findAll();
+  const [rooms, buildings] = await Promise.all([
+    roomService.findAll(),
+    buildingService.findAll(),
+  ]);
+
+  const statusStyle: Record<string, string> = {
+    OCCUPIED:    'bg-primary/10 text-primary border-primary/30',
+    VACANT:      'bg-emerald-50 text-emerald-700 border-emerald-200',
+    MAINTENANCE: 'bg-amber-50 text-amber-700 border-amber-200',
+  };
+
+  const statusLabel: Record<string, string> = {
+    OCCUPIED:    'มีผู้เช่า',
+    VACANT:      'ว่าง',
+    MAINTENANCE: 'ซ่อมแซม',
+  };
+
+  const buildingList = buildings.map((b: any) => ({ id: b.id, name: b.name }));
 
   return (
-    <div className="space-y-10 pb-10">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="space-y-6 max-w-6xl mx-auto">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-black tracking-tight mb-2">Rooms Inventory</h1>
-          <p className="text-muted-foreground text-lg italic">Inventory and booking status of all units.</p>
+          <h1 className="text-2xl font-black tracking-tight">ห้องพัก</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">ห้องทั้งหมด {rooms.length} ห้อง</p>
         </div>
-        <div className="flex items-center gap-3">
-           <Button variant="ghost" className="h-14 px-6 rounded-2xl bg-white/5 font-bold">
-              <Filter className="w-5 h-5 mr-2" />
-              Filter
-           </Button>
-           <Button className="h-14 px-8 rounded-2xl bg-primary hover:bg-primary/90 font-bold text-lg shadow-lg shadow-primary/20 group transition-all active:scale-95">
-              <Plus className="w-6 h-6 mr-2 group-hover:rotate-90 transition-transform" />
-              Add Room
-           </Button>
-        </div>
+        <AddRoomDialog buildings={buildingList} />
       </div>
 
-      <Card className="glass border-none overflow-hidden">
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-white/[0.02] border-b border-white/5">
-                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Unit Info</th>
-                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Building</th>
-                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-center">Floor</th>
-                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Monthly Rent</th>
-                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Status</th>
-                  <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right">Actions</th>
+      {rooms.length === 0 ? (
+        <div className="surface rounded-xl p-12 text-center text-muted-foreground">
+          <p className="text-base font-medium">ยังไม่มีห้องพัก</p>
+          <p className="text-sm mt-1">กดปุ่ม "เพิ่มห้อง" เพื่อเริ่มต้น</p>
+        </div>
+      ) : (
+        <div className="surface rounded-xl overflow-hidden">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-border bg-secondary/30">
+                <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-muted-foreground">ห้อง</th>
+                <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-muted-foreground">อาคาร</th>
+                <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-muted-foreground text-center">ชั้น</th>
+                <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-muted-foreground text-center hidden sm:table-cell">ขนาด</th>
+                <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-muted-foreground">ค่าเช่า/เดือน</th>
+                <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-muted-foreground">สถานะ</th>
+                <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-muted-foreground text-right">แก้ไข</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {rooms.map((room: any) => (
+                <tr key={room.id} className="hover:bg-accent/50 transition-colors">
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                        <Key className="w-3.5 h-3.5 text-primary" />
+                      </div>
+                      <span className="font-black tabnum text-sm">{room.roomNumber}</span>
+                    </div>
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <Building2 className="w-3.5 h-3.5 shrink-0" />
+                      <span className="font-medium">{room.building.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-5 py-4 text-center">
+                    <span className="text-sm tabnum text-muted-foreground font-medium">{room.floor ?? '—'}</span>
+                  </td>
+                  <td className="px-5 py-4 text-center hidden sm:table-cell">
+                    <span className="text-sm tabnum text-muted-foreground font-medium">
+                      {room.sizeSqm ? `${room.sizeSqm} ตร.ม.` : '—'}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className="font-black tabnum">฿{room.baseRentTHB.toLocaleString()}</span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <Badge className={cn('text-xs font-semibold', statusStyle[room.status] ?? 'bg-muted/20 text-muted-foreground border-border')}>
+                      {statusLabel[room.status] ?? room.status}
+                    </Badge>
+                  </td>
+                  <td className="px-5 py-4 text-right">
+                    <AddRoomDialog
+                      buildings={buildingList}
+                      initialData={{
+                        id:          room.id,
+                        buildingId:  room.buildingId,
+                        roomNumber:  room.roomNumber,
+                        floor:       room.floor,
+                        sizeSqm:     room.sizeSqm,
+                        baseRentTHB: room.baseRentTHB,
+                        status:      room.status,
+                      }}
+                    />
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {rooms.map((room) => {
-                  const statusColors = {
-                    OCCUPIED: "bg-primary/20 text-primary border-primary/20",
-                    VACANT: "bg-emerald-400/20 text-emerald-400 border-emerald-400/20",
-                    MAINTENANCE: "bg-amber-400/20 text-amber-400 border-amber-400/20",
-                  }[room.status] || "bg-muted/20 text-muted border-muted/20";
-
-                  return (
-                    <tr key={room.id} className="group hover:bg-white/[0.02] transition-colors duration-200">
-                      <td className="px-8 py-6">
-                        <div className="flex items-center gap-4">
-                          <div className="p-3 bg-white/5 rounded-2xl border border-white/5 group-hover:bg-primary/10 group-hover:border-primary/20 transition-all">
-                             <Key className="w-5 h-5 text-primary" />
-                          </div>
-                          <div>
-                             <p className="font-black text-lg">{room.roomNumber}</p>
-                             <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-60">Standard Unit</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-8 py-6">
-                        <div className="flex items-center gap-2">
-                           <Building2 className="w-4 h-4 text-muted-foreground" />
-                           <span className="font-semibold text-sm">{room.building.name}</span>
-                        </div>
-                      </td>
-                      <td className="px-8 py-6 text-center">
-                        <Badge variant="ghost" className="bg-white/5 text-foreground font-bold">
-                           FL {room.floor}
-                        </Badge>
-                      </td>
-                      <td className="px-8 py-6">
-                        <span className="font-black text-lg">฿{room.baseRentTHB.toLocaleString()}</span>
-                      </td>
-                      <td className="px-8 py-6">
-                        <Badge className={cn("px-3 py-1 font-bold rounded-lg border-none shadow-sm", statusColors)}>
-                          {room.status}
-                        </Badge>
-                      </td>
-                      <td className="px-8 py-6">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-primary/10 hover:text-primary transition-all">
-                            <Edit3 className="w-4 h-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-secondary transition-all">
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-secondary">
-                            <MoreVertical className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

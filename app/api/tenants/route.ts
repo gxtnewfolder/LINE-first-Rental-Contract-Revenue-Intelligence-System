@@ -1,6 +1,7 @@
 // Tenants API - GET all, POST create
 import { NextResponse } from 'next/server';
 import { tenantService } from '@/services/tenant.service';
+import { CreateTenantSchema } from '@/lib/validations/tenant.schema';
 
 export async function GET() {
   try {
@@ -18,7 +19,11 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const tenant = await tenantService.create(body);
+    const parsed = CreateTenantSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 });
+    }
+    const tenant = await tenantService.create(parsed.data);
     return NextResponse.json(tenant, { status: 201 });
   } catch (error) {
     console.error('POST /api/tenants error:', error);

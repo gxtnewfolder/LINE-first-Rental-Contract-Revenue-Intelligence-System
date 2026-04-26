@@ -1,25 +1,24 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Sarabun } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
+const sarabun = Sarabun({
+  subsets: ["latin", "thai"],
+  weight: ["400", "500", "600", "700", "800"],
   variable: "--font-sans",
 });
 
 export const metadata: Metadata = {
-  title: "RentalAI | Revenue Intelligence System",
-  description: "AI-powered rental contract and revenue management system",
+  title: "uSabai — อยู่สบาย",
+  description: "ระบบจัดการห้องเช่า อยู่สบาย ง่ายแค่ปลายนิ้ว",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${inter.variable} antialiased font-sans bg-background text-foreground min-h-screen`}>
+    <html lang="th">
+      <body className={`${sarabun.variable} antialiased font-sans bg-background text-foreground min-h-screen`}>
         {children}
       </body>
     </html>
