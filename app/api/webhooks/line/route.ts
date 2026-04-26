@@ -1,7 +1,7 @@
 // LINE webhook endpoint
 import { NextResponse } from 'next/server';
 import { validateWebhookRequest } from '@/integrations/line/verify';
-import { replyMessage, withMenu, isOwner, textMessage, type LineWebhookBody } from '@/integrations/line/client';
+import { replyMessage, withMenu, isOwner, textMessage, type LineWebhookBody, type LineMessage } from '@/integrations/line/client';
 import { handleCommand } from '@/integrations/line/commands';
 import { handleTenantCommand, handleUnregisteredTenant, tenantMenu } from '@/integrations/line/tenant-commands';
 import { config } from '@/lib/config';
@@ -9,6 +9,99 @@ import prisma from '@/lib/db';
 
 async function findTenantByLineId(lineUserId: string) {
   return prisma.tenant.findUnique({ where: { lineUserId } });
+}
+
+function registrationFlexMessage(): LineMessage {
+  const liffId = config.liff.id;
+  const liffUrl = liffId
+    ? `https://liff.line.me/${liffId}`
+    : `${config.app.url}/tenant/register`;
+
+  return {
+    type: 'flex',
+    altText: 'ลงทะเบียนเพื่อดูข้อมูลสัญญาและค่าเช่า',
+    contents: {
+      type: 'bubble',
+      size: 'kilo',
+      header: {
+        type: 'box',
+        layout: 'vertical',
+        backgroundColor: '#06C755',
+        paddingAll: '16px',
+        contents: [
+          {
+            type: 'text',
+            text: 'HaTy หาที่',
+            color: '#ffffff',
+            weight: 'bold',
+            size: 'lg',
+          },
+          {
+            type: 'text',
+            text: 'ระบบจัดการเช่าที่พัก',
+            color: '#ffffff',
+            size: 'xs',
+            margin: 'xs',
+          },
+        ],
+      },
+      body: {
+        type: 'box',
+        layout: 'vertical',
+        spacing: 'md',
+        paddingAll: '16px',
+        contents: [
+          {
+            type: 'text',
+            text: 'สวัสดีจากเจ้าของห้อง! 👋',
+            weight: 'bold',
+            size: 'md',
+          },
+          {
+            type: 'text',
+            text: 'ลงทะเบียนเพื่อดูข้อมูลสัญญา ค่าเช่า และรับการแจ้งเตือนผ่าน LINE ได้เลย',
+            wrap: true,
+            size: 'sm',
+            color: '#555555',
+          },
+          {
+            type: 'separator',
+            margin: 'md',
+          },
+          {
+            type: 'box',
+            layout: 'vertical',
+            spacing: 'xs',
+            margin: 'md',
+            contents: [
+              { type: 'text', text: '💰 เช็คยอดค่าเช่า', size: 'sm', color: '#333333' },
+              { type: 'text', text: '📄 ดูสัญญาของคุณ', size: 'sm', color: '#333333' },
+              { type: 'text', text: '📊 ประวัติการชำระ', size: 'sm', color: '#333333' },
+              { type: 'text', text: '🔔 รับแจ้งเตือนอัตโนมัติ', size: 'sm', color: '#333333' },
+            ],
+          },
+        ],
+      },
+      footer: {
+        type: 'box',
+        layout: 'vertical',
+        paddingAll: '12px',
+        contents: [
+          {
+            type: 'button',
+            style: 'primary',
+            color: '#06C755',
+            height: 'sm',
+            action: {
+              type: 'uri',
+              label: '📱 ลงทะเบียนเลย',
+              uri: liffUrl,
+            },
+          },
+        ],
+      },
+    },
+  } as LineMessage;
 }
 
 export async function POST(request: Request) {
@@ -36,7 +129,7 @@ export async function POST(request: Request) {
       if (event.type === 'follow') {
         if (isOwner(userId)) {
           await replyMessage(event.replyToken, withMenu([
-            textMessage('👋 สวัสดีครับ เจ้าของ!\nกดปุ่มด้านล่างเพื่อดูข้อมูล 👇'),
+            textMessage('👋 สวัสดีครับ!\nกดปุ่มด้านล่างเพื่อดูข้อมูลได้เลย 👇'),
           ]));
         } else {
           const tenant = await findTenantByLineId(userId);
@@ -45,14 +138,8 @@ export async function POST(request: Request) {
               textMessage(`👋 ยินดีต้อนรับกลับมา คุณ${tenant.name}!\nกดปุ่มด้านล่างเพื่อดูข้อมูล 👇`),
             ]));
           } else {
-            await replyMessage(event.replyToken, [
-              textMessage(
-                '👋 สวัสดีจาก HaTy!\n\n' +
-                  'เพื่อดูข้อมูลสัญญาและค่าเช่า กรุณาลงทะเบียน:\n\n' +
-                  '📱 พิมพ์: ลงทะเบียน [เบอร์มือถือ]\n' +
-                  'ตัวอย่าง: ลงทะเบียน 0812345678'
-              ),
-            ]);
+            // New user — show registration Flex Message with button
+            await replyMessage(event.replyToken, [registrationFlexMessage()]);
           }
         }
         continue;
@@ -72,7 +159,6 @@ export async function POST(request: Request) {
 
       // ── Route by identity ────────────────────────────────────────
       if (isOwner(userId)) {
-        // Owner commands (รายได้, ห้องว่าง, สรุป, แนะนำ)
         const result = await handleCommand(event);
         if (result.messages.length > 0) {
           await replyMessage(event.replyToken, result.messages);
@@ -80,13 +166,22 @@ export async function POST(request: Request) {
       } else {
         const tenant = await findTenantByLineId(userId);
         if (tenant) {
-          // Registered tenant commands (ค่าเช่า, สัญญา, ประวัติ, ติดต่อ)
           const result = await handleTenantCommand(event, tenant.id);
           await replyMessage(event.replyToken, result.messages);
         } else {
-          // Unregistered — guide to register with phone number
+          // Check if user is trying to register via bot command
           const result = await handleUnregisteredTenant(event);
-          await replyMessage(event.replyToken, result.messages);
+          // If still not registered after command, append the registration button
+          const text = event.message?.text?.trim() || '';
+          const isRegisterAttempt = /^ลงทะเบียน|^0\d{8,9}$/.test(text);
+          if (!isRegisterAttempt) {
+            await replyMessage(event.replyToken, [
+              ...result.messages,
+              registrationFlexMessage(),
+            ]);
+          } else {
+            await replyMessage(event.replyToken, result.messages);
+          }
         }
       }
     }
